@@ -1,6 +1,14 @@
 <mat-card>
-  <form>
+  <form [formGroup]="basicForm" >
     <h2>Basic Form</h2>
 
+    <mat-form-field>
+      <input matInput placeholder="Enter your first name" formControlName="firstName" required>
+      <mat-error>
+        <app-validation-error [group]="basicForm" controlName="firstName"></app-validation-error>
+      </mat-error>
+    </mat-form-field>
+
+    <button type="submit" mat-raised-button color="primary">Submit</button>
   </form>
 </mat-card>
