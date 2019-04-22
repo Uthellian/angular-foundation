@@ -13,7 +13,7 @@ import { AppComponent } from './app.component';
 
 @NgModule({
   imports: [
-    BrowserModule, CommonModule, BrowserAnimationsModule, FormsModule, ReactiveFormsModule, AngularMaterialModule, SharedModule, AppRoutingModule
+    BrowserModule, CommonModule, BrowserAnimationsModule, AngularMaterialModule, SharedModule, AppRoutingModule
   ],
   declarations: [
     AppComponent

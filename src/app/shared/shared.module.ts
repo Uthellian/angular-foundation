@@ -14,6 +14,11 @@ import { FormErrorMessagePipe } from './pipes/form-error-message.pipe';
     ValidationErrorComponent,
     ErrorKeyPipe,
     FormErrorMessagePipe
+  ],
+  exports: [
+    ValidationErrorComponent,
+    ErrorKeyPipe,
+    FormErrorMessagePipe
   ]
 })
 export class SharedModule { }
