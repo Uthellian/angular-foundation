@@ -1,0 +1,17 @@
+<ul>
+  <ng-container *ngFor="let errorKey of formArrayErrors | errorKeys">
+    <li> 
+      {{ errorKey | formerrormessage: rootGroup.getError(errorKey) }}
+    </li>
+  </ng-container>
+  <ng-container *ngFor="let errorKey of formErrors | errorKeys">
+    <li> 
+      {{ errorKey | formerrormessage: group.getError(errorKey) }}
+    </li>
+  </ng-container>
+  <ng-container *ngFor="let errorKey of controlErrors | errorKeys">
+    <li>
+      {{ errorKey | formerrormessage: control.getError(errorKey) }}
+    </li>
+  </ng-container>
+</ul>
