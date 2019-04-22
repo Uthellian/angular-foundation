@@ -1,11 +1,11 @@
 import { NgModule, InjectionToken } from '@angular/core';
 import { Routes, RouterModule, ActivatedRouteSnapshot } from '@angular/router';
 
-/**
- * Route Definitions
- * These should only be primary routes to lazy loaded sub modules
- */
-const appRoutes: Routes = [
+const routes: Routes = [
+  {
+    path: '',
+    children: []
+  },
 	{
 		path: 'basicform',
 		loadChildren: './basic-form/basic-form.module#BasicFormModule'
@@ -15,7 +15,7 @@ const appRoutes: Routes = [
 @NgModule({
   imports: [
     RouterModule.forRoot(
-      appRoutes,
+      routes,
       {
         enableTracing: false // <-- debugging purposes only
       }
