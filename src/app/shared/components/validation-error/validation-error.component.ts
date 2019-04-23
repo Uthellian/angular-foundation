@@ -1,6 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { FormControl, ValidationErrors, FormGroup } from '@angular/forms';
 
+/**
+ * At time of writing for Angular 7 you can write up your validations any way you want so
+ * long as it follows the official documentation for reactive forms. The main purpose of
+ * this component is to extend Angular's display of reactive form with Angular material by
+ * having a component that can display a list of errors per form control without needing the
+ * developer to worry about explicity writing a "mat-error" per distinct error.
+ */
 @Component({
   selector: 'app-validation-error',
   templateUrl: './validation-error.component.html',
