@@ -15,8 +15,15 @@ import { FormControl, ValidationErrors, FormGroup } from '@angular/forms';
 })
 export class ValidationErrorComponent {
 
+  // The property name of the Angular form group we want to lookup for validation errors
   @Input() controlName: string;
+
+  // The name of the form group that encompasses the individual form control that we care
+  // about. We need this for Angular cross field validation.
   @Input() group: FormGroup;
+
+  // The name of the root form group that encompasses everything. We need this for
+  // cross field validation for form controls in form groups that are in form arrays.
   @Input() rootGroup: FormGroup;
 
   get control() {
