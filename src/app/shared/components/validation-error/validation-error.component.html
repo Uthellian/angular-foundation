@@ -1,14 +1,19 @@
 <ul>
+  <!-- Validtion errors  -->
   <ng-container *ngFor="let errorKey of formArrayErrors | errorKey">
     <li> 
       {{ errorKey | formErrorMessage: rootGroup.getError(errorKey) }}
     </li>
   </ng-container>
-  <ng-container *ngFor="let errorKey of formErrors | errorKey">
+
+  <!-- Validition errors from the form group for the specified form control. -->
+  <ng-container *ngFor="let errorKey of formGroupErrors | errorKey">
     <li> 
       {{ errorKey | formErrorMessage: group.getError(errorKey) }}
     </li>
   </ng-container>
+
+  <!-- Validition errors for the specified form control. -->
   <ng-container *ngFor="let errorKey of controlErrors | errorKey">
     <li>
       {{ errorKey | formErrorMessage: control.getError(errorKey) }}
