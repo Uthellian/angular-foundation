@@ -1,11 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, ValidationErrors, FormGroup } from '@angular/forms';
 
 /**
- * At time of writing for Angular 7 you can write up your validations any way you want so
+ * At the time of writing for Angular 7 you can write up your validations any way you want so
  * long as it follows the official documentation for reactive forms. The main purpose of
- * this component is to extend Angular's display of reactive form with Angular material by
- * having a component that can display a list of errors per form control without needing the
+ * this component is to make it easier for developers to display a list of reactive form 
+ * validation with Angular material per form control without needing the
  * developer to worry about explicity writing a "mat-error" per distinct error.
  */
 @Component({
@@ -13,17 +13,18 @@ import { FormControl, ValidationErrors, FormGroup } from '@angular/forms';
   templateUrl: './validation-error.component.html',
   styleUrls: ['./validation-error.component.css']
 })
-export class ValidationErrorComponent {
+export class ValidationErrorComponent implements OnInit {
 
-  // The property name of the Angular form group we want to lookup for validation errors
+  // The property name of the Angular form group we want to lookup validation errors
   @Input() controlName: string;
 
   // The name of the form group that encompasses the individual form control that we care
   // about. We need this for Angular cross field validation.
   @Input() group: FormGroup;
 
-  // The name of the root form group that encompasses everything. We need this for
-  // cross field validation for form controls in form groups that are in form arrays.
+  // The name of the root form group that encompasses everything. This is useful if we want
+  // to validate form controls in form groups that are within form arrays and we want to use
+  // form controls outside the form array.
   @Input() rootGroup: FormGroup;
 
   get control() {
@@ -34,10 +35,21 @@ export class ValidationErrorComponent {
     return this.control.errors;
   }
 
+  /**
+   * Search for validation errors on the form control and the form group encompassing it.
+   */
   get formErrors() {
+    // Sanity check
 		if (!this.group || (!this.controlName || !this.controlName.trim())) { return {}; }
 
+    // We'll start with looking for validation errors relevant to the specified form control.
+    // Angular stores validation errors as an object with each property being a distinct 
+    // error. So we need to convert that object into a list to make it easier to work with.
+    // The array will look like something like this:
+    // [{ "nameOfValidationAsKey1": { associatedControl: ['nameOfControl1', 'nameOfControl2'], message: 'validationMessage1' } }, 
+    // { "nameOfValidationAsKey2": { associatedControl: ['nameOfControl2', 'nameOfControl3'],// message: 'validationMessage2' } }] 
 		const groupErrorList = !this.group.errors ? [] : Object.keys(this.group.errors).map(key => ({ key, value: this.group.errors[key] }));
+    
 		const errorList = groupErrorList.filter(f => f && f.value.associatedControl &&
 			(
         (typeof f.value.associatedControl === 'string' && f.value.associatedControl === this.controlName) ||
@@ -72,5 +84,12 @@ export class ValidationErrorComponent {
 		return errorObject;
   }
   
-  constructor() { }
+  constructor() {}
+
+  ngOnInit() {
+    // Required inputs to use this component 
+    if (!this.group) { throw Error("Form group is needed to use this component."); }
+    if (!this.controlName) { throw Error("Form control name is needed to use this component"); }
+  }
+
 }
