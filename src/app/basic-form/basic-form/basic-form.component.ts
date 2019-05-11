@@ -9,7 +9,8 @@ import { FormBuilder, FormGroup, FormControl, Validators, ValidatorFn, AbstractC
 export class BasicFormComponent implements OnInit {
 
   basicForm: FormGroup = this.fb.group({
-    firstName: [null, [Validators.required]]
+    firstName: [null, [Validators.required]],
+    surnameName: [null, [Validators.required]]
   });
 
   constructor(private fb: FormBuilder) { }

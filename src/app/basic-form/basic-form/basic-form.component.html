@@ -8,6 +8,13 @@
         <app-validation-error [group]="basicForm" controlName="firstName"></app-validation-error>
       </mat-error>
     </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="Enter your surname" formControlName="surnameName" required>
+      <mat-error>
+        <app-validation-error [group]="basicForm" controlName="surnameName"></app-validation-error>
+      </mat-error>
+    </mat-form-field>
     
     <button type="submit" mat-raised-button color="primary" class="submit">Submit</button>
   </form>
