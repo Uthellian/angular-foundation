@@ -6,7 +6,7 @@ import { SharedModule } from './shared/shared.module';
 import { CommonModule } from '@angular/common';
 import { BasicFormModule } from './basic-form/basic-form.module';
 import { AppRoutingModule } from './app-routing.module';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 import { AppComponent } from './app.component';

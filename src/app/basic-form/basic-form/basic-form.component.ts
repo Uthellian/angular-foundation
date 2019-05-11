@@ -10,7 +10,8 @@ export class BasicFormComponent implements OnInit {
 
   basicForm: FormGroup = this.fb.group({
     firstName: [null, [Validators.required]],
-    surnameName: [null, [Validators.required]]
+    surnameName: [null, [Validators.required]],
+    dateOfBirth: [null, [Validators.required]]
   });
 
   constructor(private fb: FormBuilder) { }
