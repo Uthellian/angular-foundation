@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { BasicFormModule } from './basic-form/basic-form.module';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { APP_BASE_HREF } from '@angular/common';
 
 
 import { AppComponent } from './app.component';
@@ -20,6 +21,9 @@ import { AppComponent } from './app.component';
   ],
   bootstrap: [
     AppComponent
+  ],
+  providers: [
+    {provide: APP_BASE_HREF, useValue: '/'}
   ]
 })
 export class AppModule { }
