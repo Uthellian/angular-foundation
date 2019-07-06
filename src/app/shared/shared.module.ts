@@ -5,6 +5,7 @@ import { ValidationErrorComponent } from './components/validation-error/validati
 
 import { ErrorKeyPipe } from './pipes/error-key.pipe';
 import { FormErrorMessagePipe } from './pipes/form-error-message.pipe';
+import { DynamicFormQuestionComponent } from './components/dynamic-form-question/dynamic-form-question.component';
 
 @NgModule({
   imports: [
@@ -13,7 +14,8 @@ import { FormErrorMessagePipe } from './pipes/form-error-message.pipe';
   declarations: [
     ValidationErrorComponent,
     ErrorKeyPipe,
-    FormErrorMessagePipe
+    FormErrorMessagePipe,
+    DynamicFormQuestionComponent
   ],
   exports: [
     ValidationErrorComponent,
