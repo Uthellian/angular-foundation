@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AngularMaterialModule } from '../angular-material.module';
 
 import { ValidationErrorComponent } from './components/validation-error/validation-error.component';
 
@@ -9,7 +10,8 @@ import { DynamicFormQuestionComponent } from './components/dynamic-form-question
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+    AngularMaterialModule
   ],
   declarations: [
     ValidationErrorComponent,

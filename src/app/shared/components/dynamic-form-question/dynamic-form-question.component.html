@@ -1,0 +1,6 @@
+<mat-form-field>
+  <input matInput placeholder="question.placeholder" formControlName="question.key" required>
+  <mat-error>
+    <app-validation-error [group]="form" controlName="firstName"></app-validation-error>
+  </mat-error>
+</mat-form-field>

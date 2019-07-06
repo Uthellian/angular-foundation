@@ -1,7 +1,7 @@
 export class QuestionBase<T> {
   value: T;
   key: string
-  label: string;
+  placeholder: string;
   order: number;
   controlType: string;
 
@@ -9,14 +9,14 @@ export class QuestionBase<T> {
     options: {
       value?: T,
       key?: string,
-      label?: string,
+      placeholder?: string,
       order?: number,
       controlType?: string
     } = {}
   ) {
       this.value = options.value;
       this.key = options.key || '';
-      this.label = options.label || '';
+      this.placeholder = options.placeholder || '';
       this.order = options.order ? options.order : null;
       this.controlType = options.controlType || '';
   }

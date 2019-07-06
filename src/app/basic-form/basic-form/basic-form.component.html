@@ -25,6 +25,17 @@
       </mat-error>
     </mat-form-field>
 
+    <mat-form-field>
+      <mat-select formControlName="titleId" name="title" placeholder="Title">
+        <mat-option *ngFor="let title of titleRefData" [value]="title.id">
+          {{ title.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error>
+        <app-validation-error [group]="basicForm" controlName="titleId"></app-validation-error>
+      </mat-error>
+    </mat-form-field>
+
     <button type="submit" mat-raised-button color="primary" class="submit">Submit</button>
   </form>
 </mat-card>
