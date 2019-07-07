@@ -7,11 +7,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { BasicFormComponent } from './basic-form/basic-form.component';
+import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 
 @NgModule({
   imports: [
     FormsModule, ReactiveFormsModule, CommonModule, BasicFormRoutingModule, AngularMaterialModule, SharedModule
   ],
-  declarations: [BasicFormComponent]
+  declarations: [BasicFormComponent, DynamicFormComponent]
 })
 export class BasicFormModule { }

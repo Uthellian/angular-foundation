@@ -1,0 +1,10 @@
+.standard-form {
+  height: 200px;
+}
+
+.submit {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin: 5px;
+}

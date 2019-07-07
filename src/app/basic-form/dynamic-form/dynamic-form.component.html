@@ -1,0 +1,13 @@
+<mat-card>
+  <form [formGroup]="basicForm" class="standard-form">
+    <div *ngIf="1 == 1 else basicFormTemplate">
+      Not basic form.
+    </div>
+
+    <button type="submit" mat-raised-button color="primary" class="submit">Submit</button>
+  </form>
+
+  <ng-template #basicFormTemplate>
+    This is a basic form.
+  </ng-template>
+</mat-card>
