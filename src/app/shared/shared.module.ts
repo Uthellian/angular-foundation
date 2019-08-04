@@ -25,7 +25,8 @@ import { QuestionControlService } from './services/question-control.service';
   exports: [
     ValidationErrorComponent,
     ErrorKeyPipe,
-    FormErrorMessagePipe
+    FormErrorMessagePipe,
+    DynamicFormQuestionComponent
   ],
   providers: [QuestionControlService]
 })
