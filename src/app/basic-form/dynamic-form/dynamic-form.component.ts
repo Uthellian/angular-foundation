@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors, FormGroupDirective, NgForm, FormArray } from '@angular/forms';
 import { QuestionBase } from '../../shared/base/question-base';
 import { QuestionTextbox } from '../../shared/base/question-textbox';
+import { QuestionControlService } from '../../shared/services/question-control.service';
 
 @Component({
   selector: 'app-dynamic-form',
@@ -9,10 +10,7 @@ import { QuestionTextbox } from '../../shared/base/question-textbox';
   styleUrls: ['./dynamic-form.component.css']
 })
 export class DynamicFormComponent implements OnInit {
-
-  basicForm: FormGroup = this.fb.group({
-    firstName: [null, [Validators.required]]
-  });
+  form: FormGroup;
 
   questions: QuestionBase<any>[] = [
     new QuestionTextbox({
@@ -23,10 +21,14 @@ export class DynamicFormComponent implements OnInit {
     })
   ];
 
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private qcs: QuestionControlService
+  ) { }
 
   ngOnInit() {
-    
+    // If there is a red squiggle here it's probaly a StackBlitz bug.
+    this.form = this.qcs.toFormGroup(this.questions);
   }
 
 }

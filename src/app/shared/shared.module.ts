@@ -8,6 +8,7 @@ import { ValidationErrorComponent } from './components/validation-error/validati
 import { ErrorKeyPipe } from './pipes/error-key.pipe';
 import { FormErrorMessagePipe } from './pipes/form-error-message.pipe';
 import { DynamicFormQuestionComponent } from './components/dynamic-form-question/dynamic-form-question.component';
+import { QuestionControlService } from './services/question-control.service';
 
 @NgModule({
   imports: [
@@ -25,6 +26,7 @@ import { DynamicFormQuestionComponent } from './components/dynamic-form-question
     ValidationErrorComponent,
     ErrorKeyPipe,
     FormErrorMessagePipe
-  ]
+  ],
+  providers: [QuestionControlService]
 })
 export class SharedModule { }

@@ -1,5 +1,5 @@
 <mat-card>
-  <form [formGroup]="basicForm" class="standard-form">
+  <form [formGroup]="form" class="standard-form">
     <div *ngIf="1 == 2 else basicFormTemplate">
       Not basic form.
     </div>
@@ -9,6 +9,7 @@
 
   <ng-template #basicFormTemplate>
     <ng-container *ngFor="let question of questions">
+      <app-dynamic-form-question [question]="question" [form]="form"></app-dynamic-form-question>
     </ng-container>
   </ng-template>
 </mat-card>
