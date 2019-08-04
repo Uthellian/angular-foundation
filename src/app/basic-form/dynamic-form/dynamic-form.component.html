@@ -1,5 +1,5 @@
 <mat-card>
-  <form [formGroup]="form" class="standard-form">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="standard-form">
     <div *ngIf="1 == 2 else basicFormTemplate">
       Not basic form.
     </div>

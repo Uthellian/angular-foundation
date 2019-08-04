@@ -1,16 +1,16 @@
 <mat-card>
-  <form [formGroup]="basicForm" class="standard-form">
+  <form [formGroup]="basicForm" (ngSubmit)="onSubmit()" class="standard-form">
     <h2>Basic Form</h2>
 
     <mat-form-field>
-      <input matInput placeholder="First name" formControlName="firstName" required>
+      <input matInput placeholder="First name" formControlName="firstName">
       <mat-error>
         <app-validation-error [group]="basicForm" controlName="firstName"></app-validation-error>
       </mat-error>
     </mat-form-field>
 
     <mat-form-field>
-      <input matInput placeholder="Surname" formControlName="surnameName" required>
+      <input matInput placeholder="Surname" formControlName="surnameName">
       <mat-error>
         <app-validation-error [group]="basicForm" controlName="surnameName"></app-validation-error>
       </mat-error>

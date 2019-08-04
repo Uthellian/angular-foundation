@@ -1,9 +1,12 @@
+import { Validators, ValidatorFn } from '@angular/forms';
+
 export class QuestionBase<T> {
   value: T;
   key: string
   placeholder: string;
   order: number;
   controlType: string;
+  validators: [ValidatorFn];
 
   constructor(
     options: {
@@ -11,7 +14,8 @@ export class QuestionBase<T> {
       key?: string,
       placeholder?: string,
       order?: number,
-      controlType?: string
+      controlType?: string,
+      validators?: [ValidatorFn] 
     } = {}
   ) {
       this.value = options.value;
@@ -19,5 +23,6 @@ export class QuestionBase<T> {
       this.placeholder = options.placeholder || '';
       this.order = options.order ? options.order : null;
       this.controlType = options.controlType || '';
+      this.validators = options.validators || null;
   }
 }

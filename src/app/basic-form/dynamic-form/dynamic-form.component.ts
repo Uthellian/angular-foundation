@@ -15,9 +15,16 @@ export class DynamicFormComponent implements OnInit {
   questions: QuestionBase<any>[] = [
     new QuestionTextbox({
       key: 'firstName',
-      value: 'Matt',
+      value: '',
       placeholder: 'First Name',
-      order: 1
+      order: 1,
+      validators: Validators.required
+    }),
+    new QuestionTextbox({
+      key: 'surnameName',
+      value: '',
+      placeholder: 'Surname Name',
+      order: 2
     })
   ];
 
@@ -29,6 +36,12 @@ export class DynamicFormComponent implements OnInit {
   ngOnInit() {
     // If there is a red squiggle here it's probaly a StackBlitz bug.
     this.form = this.qcs.toFormGroup(this.questions);
+  }
+
+  onSubmit() {
+    // If there is a red squiggle here it's probaly a StackBlitz bug.
+    this.qcs.isFormSubmitted$.next(true);
+    console.log(this.form.valid);
   }
 
 }

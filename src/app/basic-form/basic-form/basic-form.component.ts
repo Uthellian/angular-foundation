@@ -30,4 +30,8 @@ export class BasicFormComponent implements OnInit {
   ngOnInit() {
   }
 
+  onSubmit() {
+    console.log(this.basicForm.valid);
+  }
+
 }
