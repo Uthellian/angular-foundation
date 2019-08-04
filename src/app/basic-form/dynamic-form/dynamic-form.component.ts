@@ -17,16 +17,40 @@ export class DynamicFormComponent implements OnInit {
       key: 'firstName',
       value: '',
       placeholder: 'First Name',
-      order: 1,
+      validators: Validators.required
+    }),
+    new QuestionTextbox({
+      key: 'middleName',
+      value: '',
+      placeholder: 'Middle Name',
       validators: Validators.required
     }),
     new QuestionTextbox({
       key: 'surnameName',
       value: '',
       placeholder: 'Surname Name',
-      order: 2
+      validators: Validators.required
     })
   ];
+
+  formBluePrint = {
+    personDetail: {
+      questions: [
+        new QuestionTextbox({
+          key: 'firstName',
+          value: '',
+          placeholder: 'First Name',
+          validators: Validators.required
+        }),
+        new QuestionTextbox({
+          key: 'surnameName',
+          value: '',
+          placeholder: 'Surname Name',
+          validators: Validators.required
+        })
+      ]
+    }
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -34,12 +58,11 @@ export class DynamicFormComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    // If there is a red squiggle here it's probaly a StackBlitz bug.
-    this.form = this.qcs.toFormGroup(this.questions);
+    this.form = this.qcs.createBasicFormGroup(this.questions);
+    //console.log(this.form);
   }
 
   onSubmit() {
-    // If there is a red squiggle here it's probaly a StackBlitz bug.
     this.qcs.isFormSubmitted$.next(true);
     console.log(this.form.valid);
   }
