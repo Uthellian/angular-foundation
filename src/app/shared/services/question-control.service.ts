@@ -49,7 +49,7 @@ export class QuestionControlService {
 
   createAdvancedFormGroup(bluePrint) {
     const createForm = (formModel) =>
-      formModel.constructor === Array && !!formModel.questions 
+      formModel.constructor === Array 
       ? 
         formModel.reduce((acc, curr) => ({
           ...acc, 
@@ -58,11 +58,16 @@ export class QuestionControlService {
 
         typeof formModel === 'object' && !!formModel.personDetailsGroup ?
           Object.keys(formModel).reduce((obj, prop) => {
-            console.log(formModel[prop]);
+            if (!!formModel[prop].questions) {
+              
+              // Dev help
+              console.log(createForm(formModel[prop].questions));
 
-            obj[prop] = this.fb.group(
-              createForm(formModel[prop])
-            );
+              obj[prop] = this.fb.group(
+                createForm(formModel[prop].questions)
+              );
+            }
+
 
             return obj;
           }, {})
