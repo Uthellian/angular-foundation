@@ -26,6 +26,22 @@ export class QuestionControlService {
           validators: Validators.required
         })
       ]
+    },
+    addressDetailsGroup: {
+      questions: [
+        new QuestionTextbox({
+          key: 'street',
+          value: '',
+          placeholder: 'Street',
+          validators: Validators.required
+        }),
+        new QuestionTextbox({
+          key: 'suburb',
+          value: '',
+          placeholder: 'Suburb',
+          validators: Validators.required
+        })
+      ]
     }
   }
 
