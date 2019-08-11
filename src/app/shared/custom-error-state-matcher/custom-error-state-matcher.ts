@@ -13,7 +13,6 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
         Object.keys(control.parent.errors).map(key => ({ key, value: control.parent.errors[key] })) : []
           : [];
     const idPropVal = control.parent.get('id') ? control.parent.get('id').value : null;
-    //console.log(formGroupId);
 
     const isFormArrayCrossValInError = formArrayErrors.some(f => f && f.value.associatedControl &&
 			((typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
@@ -29,15 +28,19 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
       )
     );
 
-    //console.log(controlName);
-    //console.log(isControlFromFormArray);
-    //console.log(formArrayErrors);
-    //console.log(isFormArrayCrossValInError);
-    //console.log(control.parent.parent && control.parent.parent.controls instanceof Array);
-    //console.log(form);
+    const controlFormGroupName = this.getFormGroupName(control);
+    const rootErrorsTemp = control.root.errors ?
+      Object.keys(control.root.errors).map(key => ({ key, value: form.errors[key] })).filter(f => f.value.formGroupName) : [];
+    /*const isRootCrossValInError = rootErrorsTemp.some(f => f && f.value.associatedControl &&
+			(
+        (typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
+			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlName)) &&
+        f.value.formGroupName === controlFormGroupName
+      ) 
+    );*/
 
-    //console.log(formErrorsTemp);
-    //console.log((form.invalid && isCrossValInError));
+    console.log('test');
+    //console.log(isRootCrossValInError);
 
 		return ((control.invalid || (form.invalid && isCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
 	}
@@ -67,4 +70,27 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
 
 		return name;
 	}
+
+  private getFormGroupName(control: AbstractControl) {
+    const parentGroup = <FormGroup>control.parent.parent;
+
+    if (!parentGroup) {
+			return null;
+		}
+
+		let name: string;
+
+    Object.keys(parentGroup.controls).forEach(key => {
+			const childGroup = parentGroup.get(key);
+
+			if (childGroup !== control.parent) {
+				return;
+			}
+
+			name = key;
+		});
+
+		return name;
+  }
+
 }

@@ -51,7 +51,7 @@ export class DynamicFormComponent implements OnInit {
 
     //console.log(invalidControls);
 
-    return !invalidControls.length ? null :  { 'addressDetailsRequired': { associatedControl: invalidControls, message: 'This is required.' } }
+    return !invalidControls.length ? null :  { 'addressDetailsRequired': { associatedControl: invalidControls, formGroupName: 'addressDetailsGroup', message: 'This is required.' } }
   };
 
   advancedFormRootGroup = {

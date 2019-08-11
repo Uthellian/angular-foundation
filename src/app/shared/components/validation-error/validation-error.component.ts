@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, ValidationErrors, FormGroup } from '@angular/forms';
+import { FormControl, ValidationErrors, FormGroup, AbstractControl } from '@angular/forms';
 
 /**
  * At the time of writing for Angular 7 you can write up your validations any way you want so
@@ -110,23 +110,19 @@ export class ValidationErrorComponent implements OnInit {
    * Search for validation errors within the root form group for the specified form control in a form group.
    */
   get rootFormGroupErrors() {
-    // Using the specified form control go up one level to the form group and look up the value of the form
-    // control with the following propert name "id"
-    const idPropVal = this.control.parent.get('id') ? this.control.parent.get('id').value : null;
-
-    console.log(this.control);
+    const controlFormGroupName = this.getFormGroupName(this.control);
 
     // Sanity check.
-    if (!this.rootGroup || !idPropVal) { return {} }
+    if (!this.rootGroup || !controlFormGroupName) { return {} }
 
-     // We'll start with looking for validation errors relevant to the specified form control.
+    // We'll start with looking for validation errors relevant to the specified form control.
     // Angular stores validation errors as an object with each property being a distinct 
     // error. So we need to convert that object into a list to make it easier to work with.
     // The array will look like something like this:
-    // [{ "nameOfValidationAsKey1": { associatedControl: ['nameOfControl1', 'nameOfControl2'], invalidIds: [-1, -2], message: 'validationMessage1' } }, 
-    // { "nameOfValidationAsKey2": { associatedControl: 'nameOfControl2', invalidIds: [-2], message: 'validationMessage2' } }]
+    // [{ "nameOfValidationAsKey1": { associatedControl: ['nameOfControl1', 'nameOfControl2'], formGroupName: 'addressDetailsGroup', message: 'validationMessage1' } }, 
+    // { "nameOfValidationAsKey2": { associatedControl: 'nameOfControl2', formGroupName: 'personDetailsGroup', message: 'validationMessage2' } }]
     const groupErrorList = !this.rootGroup.errors ? [] : Object.keys(this.rootGroup.errors).map(key => ({ key, value: this.rootGroup.errors[key] }))
-      .filter(f => f.value.invalidIds);
+      .filter(f => f.value.formGroupName);
 
     // Now that we have a extracted all the errors off the form group as a list we'll filter so that it
     // only contains errors relevant to the specified form control.
@@ -137,12 +133,14 @@ export class ValidationErrorComponent implements OnInit {
       ) 
     );
 
-    // We'll further filter down the list so that it will only contain errors by the value of our "id" that will fetched early.
-    const errorListFilter = errorList.filter(f => f.value.invalidIds.some(s => s === idPropVal));
+    // We'll further filter down the list to only match our four group name.
+    const errorListFilter = errorList.filter(f => f.value.formGroupName === controlFormGroupName);
 
     // If we have errors we need to convert it into a object
     const errorObject = errorListFilter && errorListFilter.length > 0 ?
 			errorListFilter.reduce((acc, cur) => ({ ...acc, [cur.key]: { ...cur.value } }), {}) : {};
+
+    console.log(errorObject);
 
 		return errorObject;
   }
@@ -153,6 +151,28 @@ export class ValidationErrorComponent implements OnInit {
     // Required inputs to use this component 
     if (!this.group) { throw Error("Form group is needed to use this component."); }
     if (!this.controlName) { throw Error("Form control name is needed to use this component"); }
+  }
+
+  private getFormGroupName(control: AbstractControl) {
+    const parentGroup = <FormGroup>control.parent.parent;
+
+    if (!parentGroup) {
+			return null;
+		}
+
+		let name: string;
+
+    Object.keys(parentGroup.controls).forEach(key => {
+			const childGroup = parentGroup.get(key);
+
+			if (childGroup !== control.parent) {
+				return;
+			}
+
+			name = key;
+		});
+
+		return name;
   }
 
 }
