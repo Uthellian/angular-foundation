@@ -1,9 +1,9 @@
 <div [formGroup]="form" #formRef="ngForm" [ngSwitch]="question.controlType">
   <ng-container *ngSwitchCase="'textbox'">
     <mat-form-field>
-          <input matInput [placeholder]="question.placeholder" [formControlName]="question.key">
+          <input matInput [placeholder]="question.placeholder" [formControlName]="question.key" [errorStateMatcher]="errorMatcher">
           <mat-error>
-            <app-validation-error [group]="form" [controlName]="question.key"></app-validation-error>
+            <app-validation-error [rootGroup]="rootForm" [group]="form" [controlName]="question.key"></app-validation-error>
           </mat-error>
     </mat-form-field>
   </ng-container>

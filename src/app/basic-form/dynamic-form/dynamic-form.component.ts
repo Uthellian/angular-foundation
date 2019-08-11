@@ -49,7 +49,7 @@ export class DynamicFormComponent implements OnInit {
     const invalidControls = isPersonDetailsCompleted && (!street || !suburb) ? !street && !suburb ? ['street', 'suburb'] : !street ? ['street'] : ['suburb']
     : [];
 
-    console.log(invalidControls);
+    //console.log(invalidControls);
 
     return !invalidControls.length ? null :  { 'addressDetailsRequired': { associatedControl: invalidControls, message: 'This is required.' } }
   };

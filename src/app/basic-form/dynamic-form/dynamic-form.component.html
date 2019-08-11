@@ -22,7 +22,7 @@
   <ng-template #basicFormBlockTemplate let-heading="heading" let-questions="questions" let-formName="formName">
     <h2>{{ heading }}</h2>
     <ng-container *ngFor="let question of questions">
-      <app-dynamic-form-question [question]="question" [form]="form.get(formName)"></app-dynamic-form-question>
+      <app-dynamic-form-question [question]="question" [form]="form.get(formName)" [rootForm]="form"></app-dynamic-form-question>
     </ng-container>
   </ng-template>
 
