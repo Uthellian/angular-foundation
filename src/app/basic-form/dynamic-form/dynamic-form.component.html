@@ -1,8 +1,10 @@
 <mat-card>
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="standard-form">
     <div *ngIf="!formModel.isBasicForm else basicFormTemplate">
-      <div *ngFor="let formGroupName of allFormGroupNames">
-        <ng-container *ngTemplateOutlet="basicFormBlockTemplate; context: { questions: formModel[formGroupName].questions, formName: formGroupName }"></ng-container>
+      <div *ngFor="let formGroupName of allFormGroupNames; let i = index">
+        <ng-container *ngTemplateOutlet="basicFormBlockTemplate; context: { heading: formModel[formGroupName].sectionHeading, questions: formModel[formGroupName].questions, formName: formGroupName }"></ng-container>
+
+        <mat-divider *ngIf="(i + 1) < allFormGroupNames.length"></mat-divider>
       </div>
     </div>
 
@@ -17,9 +19,12 @@
   </ng-template>
 
   <!-- Building blocks for Advanced Form -->
-  <ng-template #basicFormBlockTemplate let-questions="questions" let-formName="formName">
+  <ng-template #basicFormBlockTemplate let-heading="heading" let-questions="questions" let-formName="formName">
+    <h2>{{ heading }}</h2>
     <ng-container *ngFor="let question of questions">
       <app-dynamic-form-question [question]="question" [form]="form.get(formName)"></app-dynamic-form-question>
     </ng-container>
   </ng-template>
+
+  <!-- TODO: Form Array -->
 </mat-card>

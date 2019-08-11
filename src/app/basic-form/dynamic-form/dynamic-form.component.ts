@@ -37,8 +37,26 @@ export class DynamicFormComponent implements OnInit {
     isBasicForm: true
   }
   
+  addressDetailsRequiredValidator: ValidatorFn = (formGroup: FormGroup): ValidationErrors | null => {
+    const firstName = formGroup.get('personDetailsGroup').get('firstName').value;
+    const surname = formGroup.get('personDetailsGroup').get('surname').value;
+
+    const street = formGroup.get('addressDetailsGroup').get('street').value;
+    const suburb = formGroup.get('addressDetailsGroup').get('suburb').value;
+
+    const isPersonDetailsCompleted = firstName && surname;
+    
+    const invalidControls = isPersonDetailsCompleted && (!street || !suburb) ? !street && !suburb ? ['street', 'suburb'] : !street ? ['street'] : ['suburb']
+    : [];
+
+    console.log(invalidControls);
+
+    return !invalidControls.length ? null :  { 'addressDetailsRequired': { associatedControl: invalidControls, message: 'This is required.' } }
+  };
+
   advancedFormRootGroup = {
     personDetailsGroup: {
+      sectionHeading: 'Person Details',
       questions: [
         new QuestionTextbox({
           key: 'firstName',
@@ -47,7 +65,7 @@ export class DynamicFormComponent implements OnInit {
           validators: Validators.required
         }),
         new QuestionTextbox({
-          key: 'surnameName',
+          key: 'surname',
           value: '',
           placeholder: 'Surname Name',
           validators: Validators.required
@@ -56,22 +74,24 @@ export class DynamicFormComponent implements OnInit {
       isFormGroup: true
     },
     addressDetailsGroup: {
+      sectionHeading: 'Address Details',
       questions: [
         new QuestionTextbox({
           key: 'street',
           value: '',
           placeholder: 'Street',
-          validators: Validators.required
+          validators: null
         }),
         new QuestionTextbox({
           key: 'suburb',
           value: '',
           placeholder: 'Suburb',
-          validators: Validators.required
+          validators: null
         })
       ],
       isFormGroup: true
     },
+    groupValidators: [this.addressDetailsRequiredValidator],
     isBasicForm: false
   }
 
@@ -92,7 +112,7 @@ export class DynamicFormComponent implements OnInit {
   ngOnInit() {
     this.form = this.qcs.createAdvancedFormGroup(this.advancedFormRootGroup);
     //this.form = this.qcs.createBasicFormGroup(this.basicFormRootGroup.questions);
-    //console.log(this.form);
+    console.log(this.form);
   }
 
   onSubmit() {

@@ -79,10 +79,14 @@ export class QuestionControlService {
             if (!!formModel[prop].questions) {
               
               // Dev help
-              //console.log(createForm(formModel[prop].questions));
+              //console.log(formModel[prop].groupValidators);
 
-              obj[prop] = this.fb.group(
+              obj[prop] = !formModel[prop].groupValidators ? this.fb.group(
                 createForm(formModel[prop].questions)
+              ) : this.fb.group(
+                createForm(formModel[prop].questions), {
+                  validator: formModel[prop].groupValidators
+                }
               );
             }
 
@@ -94,7 +98,7 @@ export class QuestionControlService {
     
     let newFormGroup = createForm(bluePrint);
 
-    return new FormGroup(newFormGroup);
+    return !bluePrint.groupValidators ? new FormGroup(newFormGroup) : new FormGroup(newFormGroup, { validators: bluePrint.groupValidators, asyncValidators: [] });
     //return newFormGroup;
   }
 
