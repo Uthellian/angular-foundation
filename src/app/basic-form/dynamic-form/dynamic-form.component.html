@@ -1,8 +1,8 @@
 <mat-card>
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="standard-form">
     <div *ngIf="!formModel.isBasicForm else basicFormTemplate">
-      <div *ngFor="formGroupName in allFormGroupNames">
-        <ng-container *ngTemplateOutlet="basicFormBlockTemplate; context: formModel[formGroupName].questions"></ng-container>
+      <div *ngFor="let formGroupName of allFormGroupNames">
+        <ng-container *ngTemplateOutlet="basicFormBlockTemplate; context: { questions: formModel[formGroupName].questions, formName: formGroupName }"></ng-container>
       </div>
     </div>
 
@@ -17,9 +17,9 @@
   </ng-template>
 
   <!-- Building blocks for Advanced Form -->
-  <ng-template #basicFormBlockTemplate let-questions="questions">
+  <ng-template #basicFormBlockTemplate let-questions="questions" let-formName="formName">
     <ng-container *ngFor="let question of questions">
-      <app-dynamic-form-question [question]="question" [form]="form"></app-dynamic-form-question>
+      <app-dynamic-form-question [question]="question" [form]="form.get(formName)"></app-dynamic-form-question>
     </ng-container>
   </ng-template>
 </mat-card>
