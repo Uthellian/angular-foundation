@@ -25,7 +25,8 @@ export class QuestionControlService {
           placeholder: 'Surname Name',
           validators: Validators.required
         })
-      ]
+      ],
+      isFormGroup: true
     },
     addressDetailsGroup: {
       questions: [
@@ -41,15 +42,16 @@ export class QuestionControlService {
           placeholder: 'Suburb',
           validators: Validators.required
         })
-      ]
+      ],
+      isFormGroup: true
     }
   }
 
   constructor(
     private fb: FormBuilder
   ) {
-    const newForm = this.createAdvancedFormGroup(this.formRootGroup);
-    console.log(newForm);
+    /*const newForm = this.createAdvancedFormGroup(this.formRootGroup);
+    console.log(newForm);*/
   }
 
   createBasicFormGroup(questions: QuestionBase<any>[] ) {
@@ -77,7 +79,7 @@ export class QuestionControlService {
             if (!!formModel[prop].questions) {
               
               // Dev help
-              console.log(createForm(formModel[prop].questions));
+              //console.log(createForm(formModel[prop].questions));
 
               obj[prop] = this.fb.group(
                 createForm(formModel[prop].questions)
@@ -92,8 +94,8 @@ export class QuestionControlService {
     
     let newFormGroup = createForm(bluePrint);
 
-    //return new FormGroup(newFormGroup);
-    return newFormGroup;
+    return new FormGroup(newFormGroup);
+    //return newFormGroup;
   }
 
 }
