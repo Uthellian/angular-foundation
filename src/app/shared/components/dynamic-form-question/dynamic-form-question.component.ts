@@ -3,7 +3,7 @@ import { FormGroup, FormGroupDirective } from '@angular/forms';
 import { filter, tap } from 'rxjs/operators';
 import { QuestionBase } from '../../base/question-base';
 import { QuestionControlService } from '../../services/question-control.service';
-import { CrossFieldErrorMatcher } from '../../custom-error-state-matcher/custom-error-state-matcher';
+import { CrossFieldErrorMatcher } from '../../form-helpers/custom-error-state-matcher';
 
 @Component({
   selector: 'app-dynamic-form-question',

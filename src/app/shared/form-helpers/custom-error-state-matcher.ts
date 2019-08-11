@@ -30,19 +30,16 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
 
     const controlFormGroupName = this.getFormGroupName(control);
     const rootErrorsTemp = control.root.errors ?
-      Object.keys(control.root.errors).map(key => ({ key, value: form.errors[key] })).filter(f => f.value.formGroupName) : [];
-    /*const isRootCrossValInError = rootErrorsTemp.some(f => f && f.value.associatedControl &&
+      Object.keys(control.root.errors).map(key => ({ key, value: control.root.errors[key] })).filter(f => f.value.formGroupName) : [];
+    const isRootCrossValInError = rootErrorsTemp.some(f => f && f.value.associatedControl &&
 			(
         (typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
 			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlName)) &&
         f.value.formGroupName === controlFormGroupName
       ) 
-    );*/
+    );
 
-    console.log('test');
-    //console.log(isRootCrossValInError);
-
-		return ((control.invalid || (form.invalid && isCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
+		return ((control.invalid || (form.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
 	}
 
 	/**

@@ -140,8 +140,6 @@ export class ValidationErrorComponent implements OnInit {
     const errorObject = errorListFilter && errorListFilter.length > 0 ?
 			errorListFilter.reduce((acc, cur) => ({ ...acc, [cur.key]: { ...cur.value } }), {}) : {};
 
-    console.log(errorObject);
-
 		return errorObject;
   }
 
