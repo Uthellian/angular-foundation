@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors, FormGroupDirective, NgForm, FormArray } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
+import { getFormGroupName, getControlName } from './reactive-form-helper';
 
 export class CrossFieldErrorMatcher implements ErrorStateMatcher {
 
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-		const controlName = this.getName(control);
+		const controlName = getControlName(control);
 
     const isControlFromFormArray = !!control.parent.parent && control.parent.parent.controls instanceof Array;
     const formArrayErrors = isControlFromFormArray ? 
@@ -28,7 +29,7 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
       )
     );
 
-    const controlFormGroupName = this.getFormGroupName(control);
+    const controlFormGroupName = getFormGroupName(control);
     const rootErrorsTemp = control.root.errors ?
       Object.keys(control.root.errors).map(key => ({ key, value: control.root.errors[key] })).filter(f => f.value.formGroupName) : [];
     const isRootCrossValInError = rootErrorsTemp.some(f => f && f.value.associatedControl &&
@@ -41,53 +42,5 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
 
 		return ((control.invalid || (form.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
 	}
-
-	/**
-	 * Get the name of the form control.
-	 * @param control - Angular form control
-	 */
-	private getName(control: AbstractControl): string | null {
-		const group = <FormGroup>control.parent;
-
-		if (!group) {
-			return null;
-		}
-
-		let name: string;
-
-		Object.keys(group.controls).forEach(key => {
-			const childControl = group.get(key);
-
-			if (childControl !== control) {
-				return;
-			}
-
-			name = key;
-		});
-
-		return name;
-	}
-
-  private getFormGroupName(control: AbstractControl) {
-    const parentGroup = <FormGroup>control.parent.parent;
-
-    if (!parentGroup) {
-			return null;
-		}
-
-		let name: string;
-
-    Object.keys(parentGroup.controls).forEach(key => {
-			const childGroup = parentGroup.get(key);
-
-			if (childGroup !== control.parent) {
-				return;
-			}
-
-			name = key;
-		});
-
-		return name;
-  }
 
 }

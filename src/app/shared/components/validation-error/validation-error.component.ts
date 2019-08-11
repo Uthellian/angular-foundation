@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, ValidationErrors, FormGroup, AbstractControl } from '@angular/forms';
+import { getFormGroupName, getControlName } from '../../form-helpers/reactive-form-helper';
 
 /**
  * At the time of writing for Angular 7 you can write up your validations any way you want so
@@ -110,7 +111,7 @@ export class ValidationErrorComponent implements OnInit {
    * Search for validation errors within the root form group for the specified form control in a form group.
    */
   get rootFormGroupErrors() {
-    const controlFormGroupName = this.getFormGroupName(this.control);
+    const controlFormGroupName = getFormGroupName(this.control);
 
     // Sanity check.
     if (!this.rootGroup || !controlFormGroupName) { return {} }
@@ -149,28 +150,6 @@ export class ValidationErrorComponent implements OnInit {
     // Required inputs to use this component 
     if (!this.group) { throw Error("Form group is needed to use this component."); }
     if (!this.controlName) { throw Error("Form control name is needed to use this component"); }
-  }
-
-  private getFormGroupName(control: AbstractControl) {
-    const parentGroup = <FormGroup>control.parent.parent;
-
-    if (!parentGroup) {
-			return null;
-		}
-
-		let name: string;
-
-    Object.keys(parentGroup.controls).forEach(key => {
-			const childGroup = parentGroup.get(key);
-
-			if (childGroup !== control.parent) {
-				return;
-			}
-
-			name = key;
-		});
-
-		return name;
   }
 
 }
