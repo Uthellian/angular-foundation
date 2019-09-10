@@ -3,11 +3,15 @@ import { FormBuilder, FormGroup, FormControl, Validators, ValidatorFn, AbstractC
 import { ErrorStateMatcher } from '@angular/material';
 import { getFormGroupName, getControlName } from './reactive-form-helper';
 
+/**
+ * When used, override Angular's default behaviour as to when error messages are shown for a reactive form control.
+ */
 export class CrossFieldErrorMatcher implements ErrorStateMatcher {
 
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
 		const controlName = getControlName(control);
 
+    // Check if we have any cross field validation errors for a form array
     const isControlFromFormArray = !!control.parent.parent && control.parent.parent.controls instanceof Array;
     const formArrayErrors = isControlFromFormArray ? 
       control.parent.errors ? 
@@ -15,6 +19,7 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
           : [];
     const idPropVal = control.parent.get('id') ? control.parent.get('id').value : null;
 
+    // Check if we have any cross field validation errors for a form group
     const isFormArrayCrossValInError = formArrayErrors.some(f => f && f.value.associatedControl &&
 			((typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
 			(f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlName))));
@@ -29,6 +34,7 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
       )
     );
 
+    // Check if we have any cross field validation errors for a form group within a root form group
     const controlFormGroupName = getFormGroupName(control);
     const rootErrorsTemp = control.root.errors ?
       Object.keys(control.root.errors).map(key => ({ key, value: control.root.errors[key] })).filter(f => f.value.formGroupName) : [];
