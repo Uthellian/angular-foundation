@@ -1,6 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { FormControl, ValidationErrors, FormGroup, AbstractControl } from '@angular/forms';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDirective } from '@angular/forms';
 import { CrossFieldErrorMatcher } from '../../form-helpers/custom-error-state-matcher';
+import { QuestionControlService } from '../../services/question-control.service';
+import { filter, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-date-time-form-control',
@@ -17,7 +19,9 @@ export class DateTimeFormControlComponent implements OnInit {
 
   errorMatcher = new CrossFieldErrorMatcher();
 
-  constructor() { }
+  @ViewChild('formRef', null) formRef: FormGroupDirective;
+
+  constructor(private qcs: QuestionControlService) { }
 
   ngOnInit() {
     this.tempDateCtrlName = `tempDate${this.controlName}`;
@@ -25,6 +29,15 @@ export class DateTimeFormControlComponent implements OnInit {
 
     this.group.addControl(this.tempDateCtrlName, new FormControl(''));
     this.group.addControl(this.tempTimeCtrlName, new FormControl(''));
+
+    this.qcs.isFormSubmitted$
+      .pipe(
+        filter(f => f),
+        tap(() => {
+          console.log('testsdfdsf');
+          (this.formRef.submitted as any) = true;
+        })
+      ).subscribe();
   }
 
 }

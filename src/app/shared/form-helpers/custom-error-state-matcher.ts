@@ -9,7 +9,18 @@ import { getFormGroupName, getControlName } from './reactive-form-helper';
 export class CrossFieldErrorMatcher implements ErrorStateMatcher {
 
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-		const controlName = getControlName(control);
+		let controlName = getControlName(control);
+
+    const compositeControlNames = ['tempDate', 'tempTime'];
+    let isChildOfComposite = false;
+
+    for (let i = 0; i < compositeControlNames.length; i++) {
+      if (controlName.includes(compositeControlNames[i])) {
+        controlName = controlName.substring(compositeControlNames[i].length);
+        isChildOfComposite = true;
+        break;
+      }
+    }
 
     // Check if we have any cross field validation errors for a form array
     const isControlFromFormArray = !!control.parent.parent && control.parent.parent.controls instanceof Array;
@@ -46,7 +57,9 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
       ) 
     );
 
-		return ((control.invalid || (form.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
+    const isChildOfCompositeCtrlInError = isChildOfComposite && control.parent.get(controlName).invalid;
+
+		return (((control.invalid || isChildOfCompositeCtrlInError) || (form.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
 	}
 
 }
