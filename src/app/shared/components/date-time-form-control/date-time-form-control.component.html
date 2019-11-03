@@ -1,0 +1,8 @@
+<mat-form-field [formGroup]="group">
+  <input matInput [matDatepicker]="picker" placeholder="Date of birth" [formControlName]="tempDateCtrlName" [errorStateMatcher]="errorMatcher">
+  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker></mat-datepicker>
+  <mat-error>
+    <app-validation-error [group]="group" [controlName]="tempDateCtrlName"></app-validation-error>
+  </mat-error>
+</mat-form-field>

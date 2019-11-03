@@ -16,14 +16,7 @@
       </mat-error>
     </mat-form-field>
     
-    <mat-form-field>
-      <input matInput [matDatepicker]="picker" placeholder="Date of birth" formControlName="dateOfBirth">
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-      <mat-error>
-        <app-validation-error [group]="basicForm" controlName="dateOfBirth"></app-validation-error>
-      </mat-error>
-    </mat-form-field>
+    <app-date-time-form-control [group]="basicForm" controlName="dateOfBirth"></app-date-time-form-control>
 
     <mat-form-field>
       <mat-select formControlName="titleId" name="title" placeholder="Title">

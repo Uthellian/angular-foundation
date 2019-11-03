@@ -9,6 +9,7 @@ import { ErrorKeyPipe } from './pipes/error-key.pipe';
 import { FormErrorMessagePipe } from './pipes/form-error-message.pipe';
 import { DynamicFormQuestionComponent } from './components/dynamic-form-question/dynamic-form-question.component';
 import { QuestionControlService } from './services/question-control.service';
+import { DateTimeFormControlComponent } from './components/date-time-form-control/date-time-form-control.component';
 
 @NgModule({
   imports: [
@@ -20,13 +21,15 @@ import { QuestionControlService } from './services/question-control.service';
     ValidationErrorComponent,
     ErrorKeyPipe,
     FormErrorMessagePipe,
-    DynamicFormQuestionComponent
+    DynamicFormQuestionComponent,
+    DateTimeFormControlComponent
   ],
   exports: [
     ValidationErrorComponent,
     ErrorKeyPipe,
     FormErrorMessagePipe,
-    DynamicFormQuestionComponent
+    DynamicFormQuestionComponent,
+    DateTimeFormControlComponent
   ],
   providers: [QuestionControlService]
 })
