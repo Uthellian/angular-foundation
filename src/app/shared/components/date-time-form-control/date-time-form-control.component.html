@@ -7,4 +7,11 @@
       <app-validation-error [group]="group" [controlName]="tempDateCtrlName"></app-validation-error>
     </mat-error>
   </mat-form-field>
+
+  <mat-form-field>
+      <input matInput placeholder="Date of Birth Time" [formControlName]="tempTimeCtrlName" [errorStateMatcher]="errorMatcher">
+      <mat-error>
+        <app-validation-error [group]="group" [controlName]="tempTimeCtrlName"></app-validation-error>
+      </mat-error>
+    </mat-form-field>
 </div>

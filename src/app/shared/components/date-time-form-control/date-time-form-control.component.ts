@@ -3,6 +3,10 @@ import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDir
 import { CrossFieldErrorMatcher } from '../../form-helpers/custom-error-state-matcher';
 import { QuestionControlService } from '../../services/question-control.service';
 import { filter, tap } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
+import * as _moment from 'moment';
+import {default as _rollupMoment} from 'moment';
+const moment = _rollupMoment || _moment;
 
 @Component({
   selector: 'app-date-time-form-control',
@@ -21,6 +25,18 @@ export class DateTimeFormControlComponent implements OnInit {
 
   @ViewChild('formRef', null) formRef: FormGroupDirective;
 
+  get compositeControl() {
+    return this.group.get(this.controlName);
+  }
+
+  get tempDateCtrl() {
+    return this.group.get(this.tempDateCtrlName);
+  }
+
+  get tempTimeCtrl() {
+    return this.group.get(this.tempTimeCtrlName);
+  }
+
   constructor(private qcs: QuestionControlService) { }
 
   ngOnInit() {
@@ -34,10 +50,16 @@ export class DateTimeFormControlComponent implements OnInit {
       .pipe(
         filter(f => f),
         tap(() => {
-          console.log('testsdfdsf');
           (this.formRef.submitted as any) = true;
         })
       ).subscribe();
+
+    combineLatest(
+      this.tempDateCtrl.valueChanges,
+      this.tempTimeCtrl.valueChanges
+    ).subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
+      this.compositeControl.setValue(tempDateCtrlValue.toString() + tempTimeCtrlValue);
+    });
   }
 
 }

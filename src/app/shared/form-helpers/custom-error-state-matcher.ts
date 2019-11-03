@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors, FormGroupDirective, NgForm, FormArray } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
-import { getFormGroupName, getControlName } from './reactive-form-helper';
+import { getFormGroupName, getControlName, getIsCompositeControl } from './reactive-form-helper';
 
 /**
  * When used, override Angular's default behaviour as to when error messages are shown for a reactive form control.
@@ -9,18 +9,11 @@ import { getFormGroupName, getControlName } from './reactive-form-helper';
 export class CrossFieldErrorMatcher implements ErrorStateMatcher {
 
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-		let controlName = getControlName(control);
-
-    const compositeControlNames = ['tempDate', 'tempTime'];
-    let isChildOfComposite = false;
-
-    for (let i = 0; i < compositeControlNames.length; i++) {
-      if (controlName.includes(compositeControlNames[i])) {
-        controlName = controlName.substring(compositeControlNames[i].length);
-        isChildOfComposite = true;
-        break;
-      }
-    }
+		const controlDetails = getIsCompositeControl(getControlName(control));
+    
+    // Check if were validating against a composite control the name of the control should be prefixed a standard way
+    let controlName = controlDetails.controlName;
+    let isChildOfComposite = controlDetails.isChildOfComposite;
 
     // Check if we have any cross field validation errors for a form array
     const isControlFromFormArray = !!control.parent.parent && control.parent.parent.controls instanceof Array;
@@ -57,6 +50,7 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
       ) 
     );
 
+    // Check if the composite control is in error
     const isChildOfCompositeCtrlInError = isChildOfComposite && control.parent.get(controlName).invalid;
 
 		return (((control.invalid || isChildOfCompositeCtrlInError) || (form.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));

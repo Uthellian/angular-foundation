@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors, FormGroupDirective, NgForm, FormArray } from '@angular/forms';
+import { QuestionControlService } from '../../shared/services/question-control.service';
 
 export interface TitleRefData {
   id: number;
@@ -25,13 +26,17 @@ export class BasicFormComponent implements OnInit {
     { id: 2, name: 'Miss' }
   ]
 
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private qcs: QuestionControlService
+  ) { }
 
   ngOnInit() {
   }
 
   onSubmit() {
-    console.log(this.basicForm.valid);
+    console.log(this.basicForm.value);
+    this.qcs.isFormSubmitted$.next(true);
   }
 
 }

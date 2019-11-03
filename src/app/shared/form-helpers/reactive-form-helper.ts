@@ -1,5 +1,29 @@
 import { FormGroup, AbstractControl } from '@angular/forms';
 
+export interface ICompositeControlDetail {
+  isChildOfComposite: boolean;
+  controlName: string;
+}
+
+export const compositeControlNames = ['tempDate', 'tempTime'];
+
+export function getIsCompositeControl(controlName: string): ICompositeControlDetail {
+    let isChildOfComposite = false;
+
+    for (let i = 0; i < compositeControlNames.length; i++) {
+      if (controlName.includes(compositeControlNames[i])) {
+        controlName = controlName.substring(compositeControlNames[i].length);
+        isChildOfComposite = true;
+        break;
+      }
+    }
+
+    return {
+      isChildOfComposite,
+      controlName
+    }
+}
+
 export function getFormGroupName(control: AbstractControl) {
   const parentGroup = <FormGroup>control.parent.parent;
 

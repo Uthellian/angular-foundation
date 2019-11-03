@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, ValidationErrors, FormGroup, AbstractControl } from '@angular/forms';
-import { getFormGroupName, getControlName } from '../../form-helpers/reactive-form-helper';
+import { getFormGroupName, getControlName, getIsCompositeControl } from '../../form-helpers/reactive-form-helper';
 
 /**
  * At the time of writing for Angular 7 you can write up your validations any way you want so
@@ -33,6 +33,13 @@ export class ValidationErrorComponent implements OnInit {
   }
 
   get controlErrors() {
+    // Check if were validating against a composite control the name of the control should be prefixed a standard way.
+    // If we are then we'll read the errors off the control were derived from.
+    const controlDetails = getIsCompositeControl(getControlName(this.control));
+    if (controlDetails.isChildOfComposite) {
+      return this.control.parent.get(controlDetails.controlName).errors;
+    }
+
     return this.control.errors;
   }
 
