@@ -2,7 +2,7 @@ import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDirective } from '@angular/forms';
 import { CrossFieldErrorMatcher } from '../../form-helpers/custom-error-state-matcher';
 import { QuestionControlService } from '../../services/question-control.service';
-import { filter, tap } from 'rxjs/operators';
+import { filter, tap, startWith, debounceTime } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 import * as _moment from 'moment';
 import {default as _rollupMoment} from 'moment';
@@ -55,10 +55,23 @@ export class DateTimeFormControlComponent implements OnInit {
       ).subscribe();
 
     combineLatest(
-      this.tempDateCtrl.valueChanges,
-      this.tempTimeCtrl.valueChanges
-    ).subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
-      this.compositeControl.setValue(tempDateCtrlValue.toString() + tempTimeCtrlValue);
+      this.tempDateCtrl.valueChanges.pipe(startWith('')),
+      this.tempTimeCtrl.valueChanges.pipe(startWith(''))
+    ).pipe(debounceTime(500))
+    .subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
+      if (!tempDateCtrlValue && !tempTimeCtrlValue) { return; }
+
+      const dateString = moment(tempDateCtrlValue).isValid() ? 
+        moment(tempDateCtrlValue, 'DD/MM/YYYY').format('DD/MM/YYYY').toString() : '01/01/0001';
+      
+      const timeString = moment(tempTimeCtrlValue, 'HH:mm').isValid() ? 
+        moment(tempTimeCtrlValue, 'HH:mm').format('HH:mm').toString() : '00:00';
+console.log(dateString);
+console.log(timeString);
+
+      const dateTime = moment(`${dateString} ${timeString}`, 'DD/MM/YYYY HH:mm');
+      console.log(dateTime);
+      this.compositeControl.setValue(dateTime);
     });
   }
 
