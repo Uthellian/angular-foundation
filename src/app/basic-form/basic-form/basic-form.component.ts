@@ -32,6 +32,7 @@ export class BasicFormComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.basicForm.get('dateOfBirth').valueChanges.subscribe(s => console.log(s));
   }
 
   onSubmit() {

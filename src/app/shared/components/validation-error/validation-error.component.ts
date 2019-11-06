@@ -37,7 +37,7 @@ export class ValidationErrorComponent implements OnInit {
     // If we are then we'll read the errors off the control were derived from.
     const controlDetails = getIsCompositeControl(getControlName(this.control));
     if (controlDetails.isChildOfComposite) {
-      return this.control.parent.get(controlDetails.controlName).errors;
+      return { ...this.control.parent.get(controlDetails.controlName).errors, ...this.control.errors };
     }
 
     return this.control.errors;

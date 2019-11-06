@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDirective } from '@angular/forms';
+import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDirective, Validators } from '@angular/forms';
 import { CrossFieldErrorMatcher } from '../../form-helpers/custom-error-state-matcher';
 import { QuestionControlService } from '../../services/question-control.service';
 import { filter, tap, startWith, debounceTime } from 'rxjs/operators';
@@ -39,10 +39,21 @@ export class DateTimeFormControlComponent implements OnInit {
   ngOnInit() {
     this.tempDateCtrlName = `tempDate${this.controlName}`;
     this.group.addControl(this.tempDateCtrlName, new FormControl(''));
+    const isDateRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
+
+    if (isDateRequired) {
+        this.tempDateCtrl.setValidators(Validators.required);
+      }
 
     if (this.options.includeTime) {
       this.tempTimeCtrlName = `tempTime${this.controlName}`;
       this.group.addControl(this.tempTimeCtrlName, new FormControl('', { updateOn: 'blur' }));
+
+      const isTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
+      
+      if (isTimeRequired) {
+        this.tempTimeCtrl.setValidators(Validators.required);
+      }
     }
 
     this.qcs.isFormSubmitted$
@@ -58,32 +69,44 @@ export class DateTimeFormControlComponent implements OnInit {
       this.tempTimeCtrl.valueChanges.pipe(startWith(''))
     ).pipe(debounceTime(500))
     .subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
-      if (!tempDateCtrlValue && !tempTimeCtrlValue) { return; }
+      if (!tempDateCtrlValue && !tempTimeCtrlValue) {
+        this.compositeControl.setValue(null); 
+        return; 
+      }
 
-      const dateString = moment(tempDateCtrlValue).isValid() ? 
-        moment(tempDateCtrlValue, 'DD/MM/YYYY').format('DD/MM/YYYY').toString() : '01/01/0001';
+      const dateTime = this.combineDateTime(tempDateCtrlValue, tempTimeCtrlValue);
       
-      const timeString = moment(tempTimeCtrlValue, 'HH:mm').isValid() ? 
-        moment(tempTimeCtrlValue, 'HH:mm').format('HH:mm').toString() : '00:00';
-console.log(dateString);
-console.log(timeString);
-
-      const dateTime = moment(`${dateString} ${timeString}`, 'DD/MM/YYYY HH:mm');
-      console.log(dateTime);
       this.compositeControl.setValue(dateTime);
+    });
+
+    this.compositeControl.valueChanges.subscribe(s => {
+
+
+      this.tempDateCtrl.setValue(s, { emitEvent: false });
+      this.tempTimeCtrl.setValue(s, { emitEvent: false });
     });
   }
 
-  combine() {
+  combineDateTime(dateValue: Date, timeValue: string) {
+    const dateString = moment(dateValue).isValid() ? 
+        moment(dateValue, 'DD/MM/YYYY').format('DD/MM/YYYY').toString() : '01/01/0001';
+      
+      const timeString = moment(timeValue, 'HH:mm').isValid() ? 
+        moment(timeValue, 'HH:mm').format('HH:mm').toString() : '00:00';
 
+      const dateTime = moment(`${dateString} ${timeString}`, 'DD/MM/YYYY HH:mm');
+
+    return dateTime;
   }
 
   tempDateChange(event: MatDatepickerInputEvent<Date>) {
-    if (!this.tempDateCtrl.valid) { return; }
+    if (!this.tempDateCtrl.valid) { 
+      this.tempDateCtrlValue$.next(null);
+      return; 
+    }
 
     const tempDateValue = event.value;
     this.tempDateCtrlValue$.next(tempDateValue);
   }
-
 
 }
