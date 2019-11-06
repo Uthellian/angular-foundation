@@ -36,6 +36,7 @@ export class BasicFormComponent implements OnInit {
   }
 
   onSubmit() {
+    this.basicForm.get('dateOfBirth').setValue(new Date());
     console.log(this.basicForm.value);
     this.qcs.isFormSubmitted$.next(true);
   }

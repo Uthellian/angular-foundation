@@ -29,6 +29,7 @@ export class DateTimeFormControlComponent implements OnInit {
   tempTimeCtrlName: string;
 
   tempDateCtrlValue$: BehaviorSubject<Date> = new BehaviorSubject(null);
+  isUpdateCompositeControl: boolean = false;
 
   get compositeControl() { return this.group.get(this.controlName); }
   get tempDateCtrl() { return this.group.get(this.tempDateCtrlName); }
@@ -39,9 +40,9 @@ export class DateTimeFormControlComponent implements OnInit {
   ngOnInit() {
     this.tempDateCtrlName = `tempDate${this.controlName}`;
     this.group.addControl(this.tempDateCtrlName, new FormControl(''));
-    const isDateRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
+    const isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
 
-    if (isDateRequired) {
+    if (isDateTimeRequired) {
         this.tempDateCtrl.setValidators(Validators.required);
       }
 
@@ -49,9 +50,7 @@ export class DateTimeFormControlComponent implements OnInit {
       this.tempTimeCtrlName = `tempTime${this.controlName}`;
       this.group.addControl(this.tempTimeCtrlName, new FormControl('', { updateOn: 'blur' }));
 
-      const isTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
-      
-      if (isTimeRequired) {
+      if (isDateTimeRequired) {
         this.tempTimeCtrl.setValidators(Validators.required);
       }
     }
@@ -69,6 +68,8 @@ export class DateTimeFormControlComponent implements OnInit {
       this.tempTimeCtrl.valueChanges.pipe(startWith(''))
     ).pipe(debounceTime(500))
     .subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
+      this.isUpdateCompositeControl = true;
+
       if (!tempDateCtrlValue && !tempTimeCtrlValue) {
         this.compositeControl.setValue(null); 
         return; 
@@ -80,21 +81,42 @@ export class DateTimeFormControlComponent implements OnInit {
     });
 
     this.compositeControl.valueChanges.subscribe(s => {
+      if (this.isUpdateCompositeControl) { 
+        this.isUpdateCompositeControl = false;
+        return;
+      }
 
+      console.log('test');
+      if (!s) {
+        this.tempDateCtrl.setValue(null, { emitEvent: false });
+        this.tempTimeCtrl.setValue(null, { emitEvent: false });
+        return;
+      }
 
-      this.tempDateCtrl.setValue(s, { emitEvent: false });
-      this.tempTimeCtrl.setValue(s, { emitEvent: false });
+      const date = moment(this.getDateString(s), 'DD/MM/YYYY').toDate();
+      const timeString = this.getTimeString(s);
+
+      this.tempDateCtrl.setValue(date, { emitEvent: false });
+      this.tempTimeCtrl.setValue(timeString, { emitEvent: false });
     });
   }
 
-  combineDateTime(dateValue: Date, timeValue: string) {
+  getDateString(dateValue: Date) {
     const dateString = moment(dateValue).isValid() ? 
         moment(dateValue, 'DD/MM/YYYY').format('DD/MM/YYYY').toString() : '01/01/0001';
-      
-      const timeString = moment(timeValue, 'HH:mm').isValid() ? 
-        moment(timeValue, 'HH:mm').format('HH:mm').toString() : '00:00';
+    return dateString;
+  }
 
-      const dateTime = moment(`${dateString} ${timeString}`, 'DD/MM/YYYY HH:mm');
+  getTimeString(timeValue: string) {
+    const timeString = moment(timeValue, 'HH:mm').isValid() ? 
+        moment(timeValue, 'HH:mm').format('HH:mm').toString() : '00:00';
+    return timeString;
+  }
+
+  combineDateTime(dateValue: Date, timeValue: string) {
+    const dateString = this.getDateString(dateValue);
+    const timeString = this.getTimeString(timeValue);
+    const dateTime = moment(`${dateString} ${timeString}`, 'DD/MM/YYYY HH:mm');
 
     return dateTime;
   }
