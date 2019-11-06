@@ -3,7 +3,10 @@ import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDir
 import { CrossFieldErrorMatcher } from '../../form-helpers/custom-error-state-matcher';
 import { QuestionControlService } from '../../services/question-control.service';
 import { filter, tap, startWith, debounceTime } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { combineLatest, BehaviorSubject } from 'rxjs';
+import { IDateTimeOptions, doesFormControlHaveValidator } from '../../form-helpers/reactive-form-helper';
+
 import * as _moment from 'moment';
 import {default as _rollupMoment} from 'moment';
 const moment = _rollupMoment || _moment;
@@ -17,34 +20,30 @@ export class DateTimeFormControlComponent implements OnInit {
 
   @Input() controlName: string;
   @Input() group: FormGroup;
+  @Input() options: IDateTimeOptions;
+
+  errorMatcher = new CrossFieldErrorMatcher();
+  @ViewChild('formRef', null) formRef: FormGroupDirective;
 
   tempDateCtrlName: string;
   tempTimeCtrlName: string;
 
-  errorMatcher = new CrossFieldErrorMatcher();
+  tempDateCtrlValue$: BehaviorSubject<Date> = new BehaviorSubject(null);
 
-  @ViewChild('formRef', null) formRef: FormGroupDirective;
-
-  get compositeControl() {
-    return this.group.get(this.controlName);
-  }
-
-  get tempDateCtrl() {
-    return this.group.get(this.tempDateCtrlName);
-  }
-
-  get tempTimeCtrl() {
-    return this.group.get(this.tempTimeCtrlName);
-  }
+  get compositeControl() { return this.group.get(this.controlName); }
+  get tempDateCtrl() { return this.group.get(this.tempDateCtrlName); }
+  get tempTimeCtrl() { return this.group.get(this.tempTimeCtrlName); }
 
   constructor(private qcs: QuestionControlService) { }
 
   ngOnInit() {
     this.tempDateCtrlName = `tempDate${this.controlName}`;
-    this.tempTimeCtrlName = `tempTime${this.controlName}`;
-
     this.group.addControl(this.tempDateCtrlName, new FormControl(''));
-    this.group.addControl(this.tempTimeCtrlName, new FormControl(''));
+
+    if (this.options.includeTime) {
+      this.tempTimeCtrlName = `tempTime${this.controlName}`;
+      this.group.addControl(this.tempTimeCtrlName, new FormControl('', { updateOn: 'blur' }));
+    }
 
     this.qcs.isFormSubmitted$
       .pipe(
@@ -55,7 +54,7 @@ export class DateTimeFormControlComponent implements OnInit {
       ).subscribe();
 
     combineLatest(
-      this.tempDateCtrl.valueChanges.pipe(startWith('')),
+      this.tempDateCtrlValue$,
       this.tempTimeCtrl.valueChanges.pipe(startWith(''))
     ).pipe(debounceTime(500))
     .subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
@@ -74,5 +73,17 @@ console.log(timeString);
       this.compositeControl.setValue(dateTime);
     });
   }
+
+  combine() {
+
+  }
+
+  tempDateChange(event: MatDatepickerInputEvent<Date>) {
+    if (!this.tempDateCtrl.valid) { return; }
+
+    const tempDateValue = event.value;
+    this.tempDateCtrlValue$.next(tempDateValue);
+  }
+
 
 }

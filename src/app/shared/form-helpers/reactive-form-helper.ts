@@ -5,7 +5,17 @@ export interface ICompositeControlDetail {
   controlName: string;
 }
 
+export interface IDateTimeOptions {
+  includeTime: boolean;
+}
+
 export const compositeControlNames = ['tempDate', 'tempTime'];
+
+export function doesFormControlHaveValidator(control: AbstractControl, nameOfValidator: string) {
+  if (!control.validator) { return false; }
+  const controlValidator = control.validator({} as AbstractControl);
+  return controlValidator[nameOfValidator];
+}
 
 export function getIsCompositeControl(controlName: string): ICompositeControlDetail {
     let isChildOfComposite = false;

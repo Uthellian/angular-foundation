@@ -1,6 +1,6 @@
 <div [formGroup]="group" #formRef="ngForm">
   <mat-form-field>
-    <input matInput [matDatepicker]="picker" placeholder="Date of birth" [formControlName]="tempDateCtrlName" [errorStateMatcher]="errorMatcher">
+    <input matInput [matDatepicker]="picker" placeholder="Date of birth" [formControlName]="tempDateCtrlName" [errorStateMatcher]="errorMatcher" (dateChange)="tempDateChange($event)">
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker></mat-datepicker>
     <mat-error>
