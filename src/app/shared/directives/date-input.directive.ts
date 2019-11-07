@@ -1,4 +1,4 @@
-import { Directive, HostListener, ElementRef, Input } from '@angular/core';
+import { Directive, HostListener, ElementRef, Input, Output, EventEmitter } from '@angular/core';
 
 import { FormControl } from '@angular/forms';
 
@@ -21,6 +21,7 @@ export class DateInputDirective {
 
 	@Input() dateInput: FormControl = null;
   @Input() compositeControl: FormControl = null;
+  @Output() onDirectiveValueChanged = new EventEmitter<any>();
 
 	@HostListener('keydown', ['$event']) onKeyDown(event: any) {
 		this.onlyAllowNumericInputsOnKeyDown(event);
@@ -76,8 +77,10 @@ export class DateInputDirective {
 			this.dateInput.setValue(today);
 
       if (this.compositeControl) {
-        this.compositeControl.setValue(today);
+        //this.compositeControl.setValue(today);
       }
+
+      this.onDirectiveValueChanged.emit(today);
 
 			return;
 

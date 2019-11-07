@@ -31,6 +31,7 @@ export class DateTimeFormControlComponent implements OnInit {
   isDateTimeRequired: boolean = false;
   tempDateCtrlValue$: BehaviorSubject<Date> = new BehaviorSubject(null);
   isUpdateCompositeControl: boolean = false;
+  isUpdateDateFromDirective: boolean = false;
 
   get compositeControl() { return this.group.get(this.controlName); }
   get tempDateCtrl() { return this.group.get(this.tempDateCtrlName); }
@@ -108,9 +109,33 @@ export class DateTimeFormControlComponent implements OnInit {
     return dateString;
   }
 
-  getTimeString(timeValue: string) {
+  getTimeString(timeValue: any) {
+    // For 3 digit input, follow the rules as listed in the DDD
+		if (timeValue.length === 3 && moment(timeValue, 'H:mm').isValid()) {
+      const threeDigitTime = moment(timeValue, 'HH:mm');
+
+			const hour = timeValue.charAt(0); // The hour is the first character in a 3 digit input
+			const minutes = timeValue.substring(1); // The minutes is the 2nd and 3rd characters in a 3 digit input
+			threeDigitTime.hour(hour).minutes(minutes); // Alter the time object
+
+      const threeDigitTimeValue = threeDigitTime.format('HH:mm').toString();
+
+      if (!this.isUpdateDateFromDirective) {
+        this.tempTimeCtrl.setValue(threeDigitTimeValue, { emitEvent: false });
+      }
+
+      this.isUpdateDateFromDirective = false;
+      return threeDigitTimeValue;
+		}
+
     const timeString = moment(timeValue, 'HH:mm').isValid() ? 
         moment(timeValue, 'HH:mm').format('HH:mm').toString() : '00:00';
+
+    if (!this.isUpdateDateFromDirective) {
+      this.tempTimeCtrl.setValue(timeString, { emitEvent: false });
+    }
+    
+    this.isUpdateDateFromDirective = false;
     return timeString;
   }
 
@@ -129,6 +154,18 @@ export class DateTimeFormControlComponent implements OnInit {
     }
 
     const tempDateValue = event.value;
+    this.tempDateCtrlValue$.next(tempDateValue);
+  }
+
+  tempDateChangeFromDirective(event: Date) {
+    this.isUpdateDateFromDirective = true;
+
+    if (!this.tempDateCtrl.valid) { 
+      this.tempDateCtrlValue$.next(null);
+      return; 
+    }
+
+    const tempDateValue = event;
     this.tempDateCtrlValue$.next(tempDateValue);
   }
 
