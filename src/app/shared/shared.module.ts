@@ -10,6 +10,8 @@ import { FormErrorMessagePipe } from './pipes/form-error-message.pipe';
 import { DynamicFormQuestionComponent } from './components/dynamic-form-question/dynamic-form-question.component';
 import { QuestionControlService } from './services/question-control.service';
 import { DateTimeFormControlComponent } from './components/date-time-form-control/date-time-form-control.component';
+import { TimeInputDirective } from './directives/time-input.directive';
+import { DateInputDirective } from './directives/date-input.directive';
 
 @NgModule({
   imports: [
@@ -22,14 +24,18 @@ import { DateTimeFormControlComponent } from './components/date-time-form-contro
     ErrorKeyPipe,
     FormErrorMessagePipe,
     DynamicFormQuestionComponent,
-    DateTimeFormControlComponent
+    DateTimeFormControlComponent,
+    TimeInputDirective,
+    DateInputDirective
   ],
   exports: [
     ValidationErrorComponent,
     ErrorKeyPipe,
     FormErrorMessagePipe,
     DynamicFormQuestionComponent,
-    DateTimeFormControlComponent
+    DateTimeFormControlComponent,
+    TimeInputDirective,
+    DateInputDirective
   ],
   providers: [QuestionControlService]
 })

@@ -1,6 +1,7 @@
 <div [formGroup]="group" #formRef="ngForm">
   <mat-form-field>
-    <input matInput [matDatepicker]="picker" placeholder="Date of birth" [formControlName]="tempDateCtrlName" [errorStateMatcher]="errorMatcher" (dateChange)="tempDateChange($event)">
+    <mat-label>{{ options.dateLabel ? options.dateLabel : 'Date' }}</mat-label>
+    <input matInput [matDatepicker]="picker" [formControlName]="tempDateCtrlName" [errorStateMatcher]="errorMatcher" (dateChange)="tempDateChange($event)" [required]="isDateTimeRequired" [dateInput]="tempDateCtrl" [compositeControl]="compositeControl">
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker></mat-datepicker>
     <mat-error>
@@ -9,7 +10,8 @@
   </mat-form-field>
 
   <mat-form-field>
-      <input matInput placeholder="Date of Birth Time" [formControlName]="tempTimeCtrlName" [errorStateMatcher]="errorMatcher">
+      <mat-label>{{ options.timeLabel ? options.timeLabel : 'Time' }}</mat-label>
+      <input matInput placeholder="Date of Birth Time" [formControlName]="tempTimeCtrlName" [errorStateMatcher]="errorMatcher" [required]="isDateTimeRequired" [timeInput]="tempTimeCtrl" maxlength="5">
       <mat-error>
         <app-validation-error [group]="group" [controlName]="tempTimeCtrlName"></app-validation-error>
       </mat-error>

@@ -28,6 +28,7 @@ export class DateTimeFormControlComponent implements OnInit {
   tempDateCtrlName: string;
   tempTimeCtrlName: string;
 
+  isDateTimeRequired: boolean = false;
   tempDateCtrlValue$: BehaviorSubject<Date> = new BehaviorSubject(null);
   isUpdateCompositeControl: boolean = false;
 
@@ -40,9 +41,9 @@ export class DateTimeFormControlComponent implements OnInit {
   ngOnInit() {
     this.tempDateCtrlName = `tempDate${this.controlName}`;
     this.group.addControl(this.tempDateCtrlName, new FormControl(''));
-    const isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
+    this.isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
 
-    if (isDateTimeRequired) {
+    if (this.isDateTimeRequired) {
         this.tempDateCtrl.setValidators(Validators.required);
       }
 
@@ -50,7 +51,7 @@ export class DateTimeFormControlComponent implements OnInit {
       this.tempTimeCtrlName = `tempTime${this.controlName}`;
       this.group.addControl(this.tempTimeCtrlName, new FormControl('', { updateOn: 'blur' }));
 
-      if (isDateTimeRequired) {
+      if (this.isDateTimeRequired) {
         this.tempTimeCtrl.setValidators(Validators.required);
       }
     }

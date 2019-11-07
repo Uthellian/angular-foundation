@@ -7,6 +7,8 @@ export interface ICompositeControlDetail {
 
 export interface IDateTimeOptions {
   includeTime: boolean;
+  dateLabel: string;
+  timeLabel: string;
 }
 
 export const compositeControlNames = ['tempDate', 'tempTime'];
