@@ -20,7 +20,6 @@ export class DateInputDirective {
 	) { }
 
 	@Input() dateInput: FormControl = null;
-  @Input() compositeControl: FormControl = null;
   @Output() onDirectiveValueChanged = new EventEmitter<any>();
 
 	@HostListener('keydown', ['$event']) onKeyDown(event: any) {
@@ -75,15 +74,9 @@ export class DateInputDirective {
 			const today = moment(new Date(), 'DD/MM/YYYY').startOf('day').toDate();
 
 			this.dateInput.setValue(today);
-
-      if (this.compositeControl) {
-        //this.compositeControl.setValue(today);
-      }
-
       this.onDirectiveValueChanged.emit(today);
 
 			return;
-
 		}
 
 		// Prevent keypress if non-numeric character

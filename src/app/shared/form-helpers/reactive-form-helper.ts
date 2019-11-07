@@ -36,6 +36,10 @@ export function getIsCompositeControl(controlName: string): ICompositeControlDet
     }
 }
 
+/**
+ * Get the name of the form group.
+ * @param control - Angular form control
+ */
 export function getFormGroupName(control: AbstractControl) {
   const parentGroup = <FormGroup>control.parent.parent;
 

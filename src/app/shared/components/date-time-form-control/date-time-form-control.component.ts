@@ -65,42 +65,63 @@ export class DateTimeFormControlComponent implements OnInit {
         })
       ).subscribe();
 
-    combineLatest(
-      this.tempDateCtrlValue$,
-      this.tempTimeCtrl.valueChanges.pipe(startWith(''))
-    ).pipe(debounceTime(500))
-    .subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
-      this.isUpdateCompositeControl = true;
+    if (this.options.includeTime) {
+      combineLatest(
+        this.tempDateCtrlValue$,
+        this.tempTimeCtrl.valueChanges.pipe(startWith(''))
+      ).pipe(debounceTime(500))
+      .subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
+        this.isUpdateCompositeControl = true;
 
-      if (!tempDateCtrlValue && !tempTimeCtrlValue) {
-        this.compositeControl.setValue(null); 
-        return; 
-      }
+        if (!tempDateCtrlValue && !tempTimeCtrlValue) {
+          this.compositeControl.setValue(null); 
+          return; 
+        }
 
-      const dateTime = this.combineDateTime(tempDateCtrlValue, tempTimeCtrlValue);
-      
-      this.compositeControl.setValue(dateTime);
-    });
+        const dateTime = this.combineDateTime(tempDateCtrlValue, tempTimeCtrlValue);
+        
+        this.compositeControl.setValue(dateTime);
+      });
+    } else {
+      this.tempDateCtrlValue$.pipe(debounceTime(500)).subscribe(s => {
+        this.isUpdateCompositeControl = true;
+
+        if (!s) {
+          this.compositeControl.setValue(null); 
+          return; 
+        }
+
+        const date = moment(this.getDateString(s), 'DD/MM/YYYY').toDate(); 
+        this.compositeControl.setValue(date);
+      });
+    }
 
     this.compositeControl.valueChanges.subscribe(s => {
-      if (this.isUpdateCompositeControl) { 
-        this.isUpdateCompositeControl = false;
-        return;
-      }
+        if (this.isUpdateCompositeControl) { 
+          this.isUpdateCompositeControl = false;
+          return;
+        }
 
-      console.log('test');
-      if (!s) {
-        this.tempDateCtrl.setValue(null, { emitEvent: false });
-        this.tempTimeCtrl.setValue(null, { emitEvent: false });
-        return;
-      }
+        console.log('test');
+        if (!s) {
+          this.tempDateCtrl.setValue(null, { emitEvent: false });
 
-      const date = moment(this.getDateString(s), 'DD/MM/YYYY').toDate();
-      const timeString = this.getTimeString(s);
+          if (this.options.includeTime) {
+            this.tempTimeCtrl.setValue(null, { emitEvent: false });
+          }
+          
+          return;
+        }
 
-      this.tempDateCtrl.setValue(date, { emitEvent: false });
-      this.tempTimeCtrl.setValue(timeString, { emitEvent: false });
-    });
+        const date = moment(this.getDateString(s), 'DD/MM/YYYY').toDate();
+        
+        this.tempDateCtrl.setValue(date, { emitEvent: false });
+
+        if (this.options.includeTime) {
+          const timeString = this.getTimeString(s);
+          this.tempTimeCtrl.setValue(timeString, { emitEvent: false });
+        }
+      });
   }
 
   getDateString(dateValue: Date) {
