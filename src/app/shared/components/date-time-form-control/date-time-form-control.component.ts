@@ -86,6 +86,8 @@ export class DateTimeFormControlComponent implements OnInit {
       this.tempDateCtrlValue$.pipe(debounceTime(500)).subscribe(s => {
         this.isUpdateCompositeControl = true;
 
+        if (!this.compositeControl.value && !s) { return; }
+
         if (!s) {
           this.compositeControl.setValue(null); 
           return; 
