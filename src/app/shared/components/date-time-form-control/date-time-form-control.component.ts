@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDirective, Validators } from '@angular/forms';
-import { CrossFieldErrorMatcher } from '../../form-helpers/custom-error-state-matcher';
+import { CompositeControlErrorMatcher } from '../../form-helpers/composite-control-error-state-matcher';
 import { QuestionControlService } from '../../services/question-control.service';
 import { filter, tap, startWith, debounceTime } from 'rxjs/operators';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
@@ -22,7 +22,7 @@ export class DateTimeFormControlComponent implements OnInit {
   @Input() group: FormGroup;
   @Input() options: IDateTimeOptions;
 
-  errorMatcher = new CrossFieldErrorMatcher();
+  errorMatcher = new CompositeControlErrorMatcher();
   @ViewChild('formRef', null) formRef: FormGroupDirective;
 
   tempDateCtrlName: string;
@@ -152,7 +152,7 @@ export class DateTimeFormControlComponent implements OnInit {
 		}
 
     const timeString = moment(timeValue, 'HH:mm').isValid() ? 
-        moment(timeValue, 'HH:mm').format('HH:mm').toString() : '00:00';
+        moment(timeValue, 'HH:mm').format('HH:mm').toString() : null;
 
     if (!this.isUpdateDateFromDirective) {
       this.tempTimeCtrl.setValue(timeString, { emitEvent: false });

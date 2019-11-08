@@ -11,12 +11,17 @@ export interface IDateTimeOptions {
   timeLabel: string;
 }
 
+/** Hard coded whitelist of child contol names derived from composite control. */
 export const compositeControlNames = ['tempDate', 'tempTime'];
 
+/** Does the form control have the specified validator by name. Please note
+ *  that this currently only works with standard angular validators. For
+ *  example "Validators.required". The name for that validator will be "required".
+ */
 export function doesFormControlHaveValidator(control: AbstractControl, nameOfValidator: string) {
   if (!control.validator) { return false; }
   const controlValidator = control.validator({} as AbstractControl);
-  return controlValidator[nameOfValidator];
+  return !!controlValidator && !!controlValidator[nameOfValidator];
 }
 
 export function getIsCompositeControl(controlName: string): ICompositeControlDetail {

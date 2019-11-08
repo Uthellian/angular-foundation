@@ -10,11 +10,11 @@ import { getFormGroupName, getControlName, getIsCompositeControl } from '../../f
  * developer to worry about explicity writing a "mat-error" per distinct error.
  */
 @Component({
-  selector: 'app-validation-error',
-  templateUrl: './validation-error.component.html',
-  styleUrls: ['./validation-error.component.css']
+  selector: 'app-composite-control-validation-error',
+  templateUrl: './composite-control-validation-error.component.html',
+  styleUrls: ['./composite-control-validation-error.component.css']
 })
-export class ValidationErrorComponent implements OnInit {
+export class CompositeControlValidationErrorComponent implements OnInit {
 
   // The property name of the Angular form group we want to lookup validation errors
   @Input() controlName: string;
@@ -33,6 +33,13 @@ export class ValidationErrorComponent implements OnInit {
   }
 
   get controlErrors() {
+    // Check if were validating against a composite control the name of the control should be prefixed a standard way.
+    // If we are then we'll read the errors off the control were derived from.
+    const controlDetails = getIsCompositeControl(getControlName(this.control));
+    if (controlDetails.isChildOfComposite) {
+      return { ...this.control.parent.get(controlDetails.controlName).errors, ...this.control.errors };
+    }
+
     return this.control.errors;
   }
 

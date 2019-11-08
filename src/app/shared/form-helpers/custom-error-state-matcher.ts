@@ -9,11 +9,7 @@ import { getFormGroupName, getControlName, getIsCompositeControl } from './react
 export class CrossFieldErrorMatcher implements ErrorStateMatcher {
 
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-		const controlDetails = getIsCompositeControl(getControlName(control));
-    
-    // Check if were validating against a composite control the name of the control should be prefixed a standard way
-    let controlName = controlDetails.controlName;
-    let isChildOfComposite = controlDetails.isChildOfComposite;
+		const controlName = getControlName(control);
 
     // Check if we have any cross field validation errors for a form array
     const isControlFromFormArray = !!control.parent.parent && control.parent.parent.controls instanceof Array;
@@ -50,10 +46,7 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
       ) 
     );
 
-    // Check if the composite control is in error
-    const isChildOfCompositeCtrlInError = isChildOfComposite && control.parent.get(controlName).invalid;
-
-		return (((control.invalid || isChildOfCompositeCtrlInError) || (form.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
+		return ((control.invalid || (form.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
 	}
 
 }

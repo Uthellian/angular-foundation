@@ -12,6 +12,7 @@ import { QuestionControlService } from './services/question-control.service';
 import { DateTimeFormControlComponent } from './components/date-time-form-control/date-time-form-control.component';
 import { TimeInputDirective } from './directives/time-input.directive';
 import { DateInputDirective } from './directives/date-input.directive';
+import { CompositeControlValidationErrorComponent } from './components/composite-control-validation-error/composite-control-validation-error.component';
 
 @NgModule({
   imports: [
@@ -26,7 +27,8 @@ import { DateInputDirective } from './directives/date-input.directive';
     DynamicFormQuestionComponent,
     DateTimeFormControlComponent,
     TimeInputDirective,
-    DateInputDirective
+    DateInputDirective,
+    CompositeControlValidationErrorComponent
   ],
   exports: [
     ValidationErrorComponent,
@@ -35,7 +37,8 @@ import { DateInputDirective } from './directives/date-input.directive';
     DynamicFormQuestionComponent,
     DateTimeFormControlComponent,
     TimeInputDirective,
-    DateInputDirective
+    DateInputDirective,
+    CompositeControlValidationErrorComponent
   ],
   providers: [QuestionControlService]
 })

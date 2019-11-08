@@ -5,16 +5,16 @@
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker></mat-datepicker>
     <mat-error>
-      <app-validation-error [group]="group" [controlName]="tempDateCtrlName"></app-validation-error>
+      <app-composite-control-validation-error [group]="group" [controlName]="tempDateCtrlName"></app-composite-control-validation-error>
     </mat-error>
   </mat-form-field>
 
   <ng-container *ngIf="options.includeTime">
     <mat-form-field>
       <mat-label>{{ options.timeLabel ? options.timeLabel : 'Time' }}</mat-label>
-      <input matInput placeholder="Date of Birth Time" [formControlName]="tempTimeCtrlName" [errorStateMatcher]="errorMatcher" [required]="isDateTimeRequired" [timeInput]="tempTimeCtrl" maxlength="5">
+      <input matInput [formControlName]="tempTimeCtrlName" [errorStateMatcher]="errorMatcher" [required]="isDateTimeRequired" [timeInput]="tempTimeCtrl" maxlength="5">
       <mat-error>
-        <app-validation-error [group]="group" [controlName]="tempTimeCtrlName"></app-validation-error>
+        <app-composite-control-validation-error [group]="group" [controlName]="tempTimeCtrlName"></app-composite-control-validation-error>
       </mat-error>
     </mat-form-field>
   </ng-container>
