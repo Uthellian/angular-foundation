@@ -55,6 +55,14 @@ export class BasicFormComponent implements OnInit {
     this.dob.reset();
   }
 
+  disableDob() {
+    this.dob.disable();
+  }
+
+  undisableDob() {
+    this.dob.enable();
+  }
+
   onSubmit() {
     console.log(this.basicForm.errors);
     this.qcs.isFormSubmitted$.next(true);

@@ -104,7 +104,6 @@ export class DateTimeFormControlComponent implements OnInit {
           return;
         }
 
-        console.log('test');
         if (!s) {
           this.tempDateCtrl.setValue(null, { emitEvent: false });
 
@@ -124,6 +123,21 @@ export class DateTimeFormControlComponent implements OnInit {
           this.tempTimeCtrl.setValue(timeString, { emitEvent: false });
         }
       });
+
+    this.compositeControl.statusChanges.subscribe(s => {
+      const disabled = 'DISABLED';
+      const valid = 'VALID';
+
+      if (s === disabled && !this.tempDateCtrl.disabled) {
+        this.tempDateCtrl.disable({ emitEvent: false });
+        this.tempTimeCtrl.disable({ emitEvent: false });
+      }
+
+      if (s === valid && this.tempDateCtrl.disabled) {
+        this.tempDateCtrl.enable({ emitEvent: false });
+        this.tempTimeCtrl.enable({ emitEvent: false });
+      }
+    });
   }
 
   getDateString(dateValue: Date) {
