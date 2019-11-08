@@ -9,11 +9,12 @@ import { getFormGroupName, getControlName, getIsCompositeControl } from './react
 export class CompositeControlErrorMatcher implements ErrorStateMatcher {
 
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-		const controlDetails = getIsCompositeControl(getControlName(control));
+		const controlDetails = getIsCompositeControl(control);
     
     // Check if were validating against a composite control the name of the control should be prefixed a standard way
-    let controlName = controlDetails.controlName;
     let isChildOfComposite = controlDetails.isChildOfComposite;
+
+    let controlName = controlDetails.controlName;
 
     // Check if we have any cross field validation errors for a form array
     const isControlFromFormArray = !!control.parent.parent && control.parent.parent.controls instanceof Array;

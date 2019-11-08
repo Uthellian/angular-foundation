@@ -2,6 +2,7 @@ import { FormGroup, AbstractControl } from '@angular/forms';
 
 export interface ICompositeControlDetail {
   isChildOfComposite: boolean;
+  compositeControl: AbstractControl;
   controlName: string;
 }
 
@@ -24,8 +25,9 @@ export function doesFormControlHaveValidator(control: AbstractControl, nameOfVal
   return !!controlValidator && !!controlValidator[nameOfValidator];
 }
 
-export function getIsCompositeControl(controlName: string): ICompositeControlDetail {
+export function getIsCompositeControl(control: AbstractControl): ICompositeControlDetail {
     let isChildOfComposite = false;
+    let controlName = getControlName(control);
 
     for (let i = 0; i < compositeControlNames.length; i++) {
       if (controlName.includes(compositeControlNames[i])) {
@@ -35,8 +37,11 @@ export function getIsCompositeControl(controlName: string): ICompositeControlDet
       }
     }
 
+    const compositeControl = isChildOfComposite ? control.parent.get(controlName) : null;
+
     return {
       isChildOfComposite,
+      compositeControl,
       controlName
     }
 }

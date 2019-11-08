@@ -28,27 +28,28 @@ export class CompositeControlValidationErrorComponent implements OnInit {
   // form controls outside the form array.
   @Input() rootGroup: FormGroup;
 
+  get compositeControlDetail() {
+    const controlDetails = getIsCompositeControl(this.control);
+    return controlDetails;
+  }
+
   get control() {
     return this.group.get(this.controlName);
   }
 
   get controlErrors() {
-    // Check if were validating against a composite control the name of the control should be prefixed a standard way.
-    // If we are then we'll read the errors off the control were derived from.
-    const controlDetails = getIsCompositeControl(getControlName(this.control));
-    if (controlDetails.isChildOfComposite) {
-      return { ...this.control.parent.get(controlDetails.controlName).errors, ...this.control.errors };
-    }
-
-    return this.control.errors;
+    // Get the composite control errors in addtion to this control by the name of this control, it should be prefixed a standard way.
+    return { ...this.compositeControlDetail.compositeControl.errors, ...this.control.errors };
   }
 
   /**
    * Search for validation errors within the form group encompassing the specified form control.
    */
   get formGroupErrors() {
+    const controlDetail = this.compositeControlDetail;
+
     // Sanity check
-		if (!this.group || (!this.controlName || !this.controlName.trim())) { return {}; }
+		if (!this.group || (!controlDetail.controlName || !controlDetail.controlName.trim())) { return {}; }
 
     // We'll start with looking for validation errors relevant to the specified form control.
     // Angular stores validation errors as an object with each property being a distinct 
@@ -62,8 +63,8 @@ export class CompositeControlValidationErrorComponent implements OnInit {
     // only contains errors relevant to the specified form control.
 		const errorList = groupErrorList.filter(f => f && f.value.associatedControl &&
 			(
-        (typeof f.value.associatedControl === 'string' && f.value.associatedControl === this.controlName) ||
-			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === this.controlName))
+        (typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlDetail.controlName) ||
+			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlDetail.controlName))
       )
     );
 
@@ -79,9 +80,11 @@ export class CompositeControlValidationErrorComponent implements OnInit {
    * which is contained within a form array.
    */
   get formArrayErrors() {
+    const controlDetail = this.compositeControlDetail;
+
     // Using the specified form control go up one level to the form group and look up the value of the form
     // control with the following propert name "id"
-    const idPropVal = this.control.parent.get('id') ? this.control.parent.get('id').value : null;
+    const idPropVal = controlDetail.compositeControl.parent.get('id') ? controlDetail.compositeControl.parent.get('id').value : null;
     
     // Sanity check.
     if (!this.rootGroup || !idPropVal) { return {} }
@@ -99,8 +102,8 @@ export class CompositeControlValidationErrorComponent implements OnInit {
     // only contains errors relevant to the specified form control.
     const errorList = groupErrorList.filter(f => f && f.value.associatedControl &&
 			(
-        (typeof f.value.associatedControl === 'string' && f.value.associatedControl === this.controlName) ||
-			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === this.controlName))
+        (typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlDetail.controlName) ||
+			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlDetail.controlName))
       ) 
     );
 
@@ -118,7 +121,9 @@ export class CompositeControlValidationErrorComponent implements OnInit {
    * Search for validation errors within the root form group for the specified form control in a form group.
    */
   get rootFormGroupErrors() {
-    const controlFormGroupName = getFormGroupName(this.control);
+    const controlDetail = this.compositeControlDetail;
+
+    const controlFormGroupName = getFormGroupName(controlDetail.compositeControl);
 
     // Sanity check.
     if (!this.rootGroup || !controlFormGroupName) { return {} }
@@ -136,8 +141,8 @@ export class CompositeControlValidationErrorComponent implements OnInit {
     // only contains errors relevant to the specified form control.
     const errorList = groupErrorList.filter(f => f && f.value.associatedControl &&
 			(
-        (typeof f.value.associatedControl === 'string' && f.value.associatedControl === this.controlName) ||
-			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === this.controlName))
+        (typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlDetail.controlName) ||
+			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlDetail.controlName))
       ) 
     );
 

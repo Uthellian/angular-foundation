@@ -14,11 +14,19 @@ export interface TitleRefData {
 })
 export class BasicFormComponent implements OnInit {
 
+  dobRequiredValidator: ValidatorFn = (formGroup: FormGroup): ValidationErrors | null => {
+    const firstName = formGroup.get('firstName').value;
+    const dateOfBirth = formGroup.get('dateOfBirth').value;
+    return firstName && !dateOfBirth ? { 'dobRequired': { associatedControl: ['dateOfBirth'], message: 'Date of birth is required.' } } : null;
+  };
+
   basicForm: FormGroup = this.fb.group({
     firstName: [null, [Validators.required]],
     surnameName: [null, [Validators.required]],
-    dateOfBirth: [null, [Validators.required]],
+    dateOfBirth: [null, []],
     titleId: [null, [Validators.required]]
+  }, {
+    validator: [this.dobRequiredValidator]
   });
 
   titleRefData: TitleRefData[] = [
@@ -26,18 +34,29 @@ export class BasicFormComponent implements OnInit {
     { id: 2, name: 'Miss' }
   ]
 
+  get dob() {
+    return this.basicForm.get('dateOfBirth');
+  }
+
   constructor(
     private fb: FormBuilder,
     private qcs: QuestionControlService
   ) { }
 
   ngOnInit() {
-    this.basicForm.get('dateOfBirth').valueChanges.subscribe(s => console.log(s));
+    this.dob.valueChanges.subscribe(s => console.log(s));
+  }
+
+  setDobCurrentDate() {
+    this.dob.setValue(new Date());
+  }
+
+  clearDob() {
+    this.dob.reset();
   }
 
   onSubmit() {
-    //this.basicForm.get('dateOfBirth').setValue(new Date());
-    console.log(this.basicForm.value);
+    console.log(this.basicForm.errors);
     this.qcs.isFormSubmitted$.next(true);
   }
 
