@@ -7,14 +7,22 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { combineLatest, BehaviorSubject } from 'rxjs';
 import { IDateTimeOptions, doesFormControlHaveValidator } from '../../form-helpers/reactive-form-helper';
 
+import {MAT_MOMENT_DATE_FORMATS, MomentDateAdapter} from '@angular/material-moment-adapter';
+import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
+
 import * as _moment from 'moment';
 import {default as _rollupMoment} from 'moment';
 const moment = _rollupMoment || _moment;
 
+
 @Component({
   selector: 'app-date-time-form-control',
   templateUrl: './date-time-form-control.component.html',
-  styleUrls: ['./date-time-form-control.component.css']
+  styleUrls: ['./date-time-form-control.component.css']/*,
+  providers: [
+    {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE]},
+    {provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS},
+  ]*/
 })
 export class DateTimeFormControlComponent implements OnInit {
 
@@ -83,7 +91,7 @@ export class DateTimeFormControlComponent implements OnInit {
         this.compositeControl.setValue(dateTime);
       });
     } else {
-      this.tempDateCtrlValue$.pipe(debounceTime(500)).subscribe(s => {
+      this.tempDateCtrl.valueChanges.pipe(debounceTime(500)).subscribe(s => {
         this.isUpdateCompositeControl = true;
 
         if (!this.compositeControl.value && !s) { return; }
