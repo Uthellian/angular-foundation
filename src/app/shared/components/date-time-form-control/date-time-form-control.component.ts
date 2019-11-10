@@ -14,7 +14,14 @@ import * as _moment from 'moment';
 import {default as _rollupMoment} from 'moment';
 const moment = _rollupMoment || _moment;
 
-
+/**
+ * Common date / time component that has been created to try and make devs lives easier by:
+ *  1. Handling both date and "optionally" time without requiring devs to explicilty create
+ *     up to two form controls and the plumbling that goes with it. 
+ *  2. Common component so that if a wide spread change is required it only needs to be made in one spot.
+ *  3. Common date / time validation built in.
+ *  4. Has blur workout around for FormControl "updateOn blur bug" see https://github.com/angular/components/issues/16461  
+ */
 @Component({
   selector: 'app-date-time-form-control',
   templateUrl: './date-time-form-control.component.html',
@@ -26,19 +33,46 @@ const moment = _rollupMoment || _moment;
 })
 export class DateTimeFormControlComponent implements OnInit {
 
+  /** Composite control name */
   @Input() controlName: string;
+
+  /** Composite control form group */
   @Input() group: FormGroup;
+
+  /** Date / time component options */
   @Input() options: IDateTimeOptions;
 
+  /** Override angular validation. */
   errorMatcher = new CompositeControlErrorMatcher();
+
+  /** We need this to participate in angular validation when form is submitted. */
   @ViewChild('formRef', null) formRef: FormGroupDirective;
 
+  /** Name of dummy date form control name. */
   tempDateCtrlName: string;
+
+  /** Name of dummy time form control name. */
   tempTimeCtrlName: string;
 
   isDateTimeRequired: boolean = false;
+
+  /** 
+   * Behaviour subject to hold the value of the date control when the user blurs away from it. 
+   * We can't use the form control and set it's "updateOn to blur" because it doesn't work see 
+   * https://github.com/angular/components/issues/16461
+   */
   tempDateCtrlValue$: BehaviorSubject<Date> = new BehaviorSubject(null);
+  
+  /** 
+   * We're trying to do two way binding between dummy controls and real control so we need this 
+   * to prevent infinite loops.
+   */
   isUpdateCompositeControl: boolean = false;
+
+  /** 
+   * If the user decides to fill in today's date in the dummy date control with the "n" shortcut key
+   * we need this to prevent the time from participating as well. 
+   */
   isUpdateDateFromDirective: boolean = false;
 
   get compositeControl() { return this.group.get(this.controlName); }
@@ -48,25 +82,29 @@ export class DateTimeFormControlComponent implements OnInit {
   constructor(private qcs: QuestionControlService) { }
 
   ngOnInit() {
-    // Create a dummy form control fopr our date.
+    // Create a dummy form control for our date.
     this.tempDateCtrlName = `tempDate${this.controlName}`;
     this.group.addControl(this.tempDateCtrlName, new FormControl(''));
+
+    // Check if required validation is required by checking against the composite control
     this.isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
+    if (this.isDateTimeRequired) { this.tempDateCtrl.setValidators(Validators.required); }
 
-    // Check if date needs required validation.
-    if (this.isDateTimeRequired) {
-        this.tempDateCtrl.setValidators(Validators.required);
-      }
-
+    // Check if we need to create a dummy time form control
     if (this.options.includeTime) {
       this.tempTimeCtrlName = `tempTime${this.controlName}`;
       this.group.addControl(this.tempTimeCtrlName, new FormControl('', { updateOn: 'blur' }));
 
+      // Check if required validation is required by checking against the composite control
       if (this.isDateTimeRequired) {
         this.tempTimeCtrl.setValidators(Validators.required);
       }
     }
 
+    /** 
+     * When the form is submitted display validations where applicable for 
+     * any controls that havn't been touched.
+     */
     this.qcs.isFormSubmitted$
       .pipe(
         filter(f => f),
@@ -75,15 +113,31 @@ export class DateTimeFormControlComponent implements OnInit {
         })
       ).subscribe();
 
+    /** Code to keep our composite control value up to date based on our dummy controls. */
     if (this.options.includeTime) {
+      
+      // Keep composite control up to date based on date and time control.
       combineLatest(
         this.tempDateCtrlValue$,
         this.tempTimeCtrl.valueChanges.pipe(startWith(''))
       ).pipe(debounceTime(500))
       .subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
+        /** 
+         * If the user has entered something in full we'll do nothing but
+         * if they partially entered something like "1" we'll turn it into "01:00".
+         */  
+        if (tempTimeCtrlValue) {
+          const timeString = this.getTimeString(tempTimeCtrlValue);
+          this.tempTimeCtrl.setValue(timeString, { emitEvent: false });
+        }
+
+        // Do nothing if both our dummy and composite control don't have any value.
+        if (!tempDateCtrlValue && !this.compositeControl.value) { return }
+
         this.isUpdateCompositeControl = true;
 
-        if (!tempDateCtrlValue && !tempTimeCtrlValue) {
+        // Date takes precedence over time so if we don't have any than clear out the composite control.
+        if (!tempDateCtrlValue) {
           this.compositeControl.setValue(null); 
           return; 
         }
@@ -93,6 +147,8 @@ export class DateTimeFormControlComponent implements OnInit {
         this.compositeControl.setValue(dateTime);
       });
     } else {
+
+      // Keep composite control up to date based on date control.
       this.tempDateCtrlValue$.subscribe(s => {
         this.isUpdateCompositeControl = true;
 
@@ -134,6 +190,7 @@ export class DateTimeFormControlComponent implements OnInit {
         }
       });
 
+    /** Code to keep our dummy controls in sync with the composite control disable state. */
     this.compositeControl.statusChanges.subscribe(s => {
       const disabled = 'DISABLED';
       const valid = 'VALID';
@@ -167,20 +224,20 @@ export class DateTimeFormControlComponent implements OnInit {
 
       const threeDigitTimeValue = threeDigitTime.format('HH:mm').toString();
 
-      if (!this.isUpdateDateFromDirective) {
+      /*if (!this.isUpdateDateFromDirective) {
         this.tempTimeCtrl.setValue(threeDigitTimeValue, { emitEvent: false });
       }
 
-      this.isUpdateDateFromDirective = false;
+      this.isUpdateDateFromDirective = false;*/
       return threeDigitTimeValue;
 		}
 
     const timeString = moment(timeValue, 'HH:mm').isValid() ? 
         moment(timeValue, 'HH:mm').format('HH:mm').toString() : null;
 
-    if (!this.isUpdateDateFromDirective) {
+    /*if (!this.isUpdateDateFromDirective) {
       this.tempTimeCtrl.setValue(timeString, { emitEvent: false });
-    }
+    }*/
     
     this.isUpdateDateFromDirective = false;
     return timeString;
