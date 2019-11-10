@@ -90,7 +90,6 @@ export class DateTimeFormControlComponent implements OnInit {
 
     // Check if required validation is required by checking against the composite control
     this.isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
-    if (this.isDateTimeRequired) { this.tempDateCtrl.setValidators(Validators.required); }
 
     // Check if we need to create a dummy time form control
     if (this.options.includeTime) {
@@ -210,9 +209,7 @@ export class DateTimeFormControlComponent implements OnInit {
       if (s === disabled && !this.tempDateCtrl.disabled) {
         this.tempDateCtrl.disable({ emitEvent: false });
         this.tempTimeCtrl.disable({ emitEvent: false });
-      }
-
-      if (s === valid && this.tempDateCtrl.disabled) {
+      } else {
         this.tempDateCtrl.enable({ emitEvent: false });
         this.tempTimeCtrl.enable({ emitEvent: false });
       }
@@ -236,20 +233,11 @@ export class DateTimeFormControlComponent implements OnInit {
 
       const threeDigitTimeValue = threeDigitTime.format('HH:mm').toString();
 
-      /*if (!this.isUpdateDateFromDirective) {
-        this.tempTimeCtrl.setValue(threeDigitTimeValue, { emitEvent: false });
-      }
-
-      this.isUpdateDateFromDirective = false;*/
       return threeDigitTimeValue;
 		}
 
     const timeString = moment(timeValue, 'HH:mm').isValid() ? 
         moment(timeValue, 'HH:mm').format('HH:mm').toString() : null;
-
-    /*if (!this.isUpdateDateFromDirective) {
-      this.tempTimeCtrl.setValue(timeString, { emitEvent: false });
-    }*/
     
     this.isUpdateDateFromDirective = false;
     return timeString;

@@ -38,17 +38,20 @@ export class CompositeControlValidationErrorComponent implements OnInit {
   }
 
   get controlErrors() {
+    // Get the composite control errors in addtion to this control by the name of this control, it should be prefixed a standard way.
     const control = this.control;
     const controlDetail = this.compositeControlDetail;
+
+    // Check if this control ignores the required validation from the composite control
     const isIgnoreRequiredVal = getIsIgnoreRequiredValidation(control);
 
+    // Recreate the composite control as is or with the required validation removed if applicable 
     const compositeControlErrorList = !controlDetail.compositeControl.errors ? [] : Object.keys(controlDetail.compositeControl.errors).map(key => ({ key, value: controlDetail.compositeControl.errors[key] }))
       .filter(f => !isIgnoreRequiredVal || f.key && f.key !== 'required');
     
     const compositeControlErrorObject = compositeControlErrorList && compositeControlErrorList.length > 0 ?
 			compositeControlErrorList.reduce((acc, cur) => ({ ...acc, [cur.key]: { ...cur.value } }), {}) : {};
 
-    // Get the composite control errors in addtion to this control by the name of this control, it should be prefixed a standard way.
     return { ...compositeControlErrorObject, ...control.errors };
   }
 
