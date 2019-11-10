@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors, FormGroupDirective, NgForm, FormArray } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
-import { getFormGroupName, getControlName, getIsCompositeControl } from './reactive-form-helper';
+import { getFormGroupName, getControlName, getChildCompositeControlDetail } from './reactive-form-helper';
 
 /**
  * When used, override Angular's default behaviour as to when error messages are shown for a reactive form control.

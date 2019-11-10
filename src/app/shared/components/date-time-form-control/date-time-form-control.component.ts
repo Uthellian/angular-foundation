@@ -20,7 +20,9 @@ const moment = _rollupMoment || _moment;
  *     up to two form controls and the plumbling that goes with it. 
  *  2. Common component so that if a wide spread change is required it only needs to be made in one spot.
  *  3. Common date / time validation built in.
- *  4. Has blur workout around for FormControl "updateOn blur bug" see https://github.com/angular/components/issues/16461  
+ *  4. Has current date and time keyboard shortcut "n".
+ *  5. Has blur workout around for FormControl "updateOn blur bug" see https://github.com/angular/components/issues/16461 
+ *     Although blur workaround currently does not work with "n" shortcut 
  */
 @Component({
   selector: 'app-date-time-form-control',
@@ -142,7 +144,7 @@ export class DateTimeFormControlComponent implements OnInit {
           return; 
         }
 
-        const dateTime = this.combineDateTime(tempDateCtrlValue, tempTimeCtrlValue);
+        const dateTime = this.getCombineDateTime(tempDateCtrlValue, tempTimeCtrlValue);
         
         this.compositeControl.setValue(dateTime);
       });
@@ -154,6 +156,7 @@ export class DateTimeFormControlComponent implements OnInit {
 
         if (!this.compositeControl.value && !s) { return; }
 
+        // Do nothing if both the dummy and composite date don't have any value
         if (!s) {
           this.compositeControl.setValue(null); 
           return; 
@@ -164,12 +167,21 @@ export class DateTimeFormControlComponent implements OnInit {
       });
     }
 
+    /**
+     * When there are changes to our composite control we want to keep our
+     * dummy controls up to date.
+     */
     this.compositeControl.valueChanges.subscribe(s => {
+        /**  
+         * We don't want to update our dummy controls when the composite control
+         * was just updated from it.
+         */ 
         if (this.isUpdateCompositeControl) { 
           this.isUpdateCompositeControl = false;
           return;
         }
 
+        // Clear out our dummy controls if it doesn't have any value.
         if (!s) {
           this.tempDateCtrl.setValue(null, { emitEvent: false });
 
@@ -243,7 +255,7 @@ export class DateTimeFormControlComponent implements OnInit {
     return timeString;
   }
 
-  combineDateTime(dateValue: Date, timeValue: string) {
+  getCombineDateTime(dateValue: Date, timeValue: string) {
     const dateString = this.getDateString(dateValue);
     const timeString = this.getTimeString(timeValue);
     const dateTime = moment(`${dateString} ${timeString}`, 'DD/MM/YYYY HH:mm');
@@ -251,7 +263,7 @@ export class DateTimeFormControlComponent implements OnInit {
     return dateTime;
   }
 
-  tempDateChange(event: MatDatepickerInputEvent<Date>) {
+  tempDateChangeFromBlur(event: MatDatepickerInputEvent<Date>) {
     if (!this.tempDateCtrl.valid) { 
       this.tempDateCtrlValue$.next(null);
       return; 

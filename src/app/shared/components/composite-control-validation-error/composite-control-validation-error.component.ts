@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, ValidationErrors, FormGroup, AbstractControl } from '@angular/forms';
-import { getFormGroupName, getControlName, getIsCompositeControl } from '../../form-helpers/reactive-form-helper';
+import { getFormGroupName, getControlName, getChildCompositeControlDetail, getIsIgnoreRequiredValidation } from '../../form-helpers/reactive-form-helper';
 
 /**
  * At the time of writing for Angular 7 you can write up your validations any way you want so
@@ -29,7 +29,7 @@ export class CompositeControlValidationErrorComponent implements OnInit {
   @Input() rootGroup: FormGroup;
 
   get compositeControlDetail() {
-    const controlDetails = getIsCompositeControl(this.control);
+    const controlDetails = getChildCompositeControlDetail(this.control);
     return controlDetails;
   }
 
@@ -38,8 +38,18 @@ export class CompositeControlValidationErrorComponent implements OnInit {
   }
 
   get controlErrors() {
+    const control = this.control;
+    const controlDetail = this.compositeControlDetail;
+    const isIgnoreRequiredVal = getIsIgnoreRequiredValidation(control);
+
+    const compositeControlErrorList = !controlDetail.compositeControl.errors ? [] : Object.keys(controlDetail.compositeControl.errors).map(key => ({ key, value: controlDetail.compositeControl.errors[key] }))
+      .filter(f => !isIgnoreRequiredVal || f.key && f.key !== 'required');
+    
+    const compositeControlErrorObject = compositeControlErrorList && compositeControlErrorList.length > 0 ?
+			compositeControlErrorList.reduce((acc, cur) => ({ ...acc, [cur.key]: { ...cur.value } }), {}) : {};
+
     // Get the composite control errors in addtion to this control by the name of this control, it should be prefixed a standard way.
-    return { ...this.compositeControlDetail.compositeControl.errors, ...this.control.errors };
+    return { ...compositeControlErrorObject, ...control.errors };
   }
 
   /**

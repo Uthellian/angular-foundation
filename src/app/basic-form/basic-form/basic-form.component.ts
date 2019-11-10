@@ -23,7 +23,7 @@ export class BasicFormComponent implements OnInit {
   basicForm: FormGroup = this.fb.group({
     firstName: [null, [Validators.required]],
     surnameName: [null, [Validators.required]],
-    dateOfBirth: [null, []],
+    dateOfBirth: [null, [Validators.required]],
     titleId: [null, [Validators.required]]
   }, {
     validator: [this.dobRequiredValidator]

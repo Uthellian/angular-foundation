@@ -1,7 +1,7 @@
 <div [formGroup]="group" #formRef="ngForm">
   <mat-form-field>
     <mat-label>{{ options.dateLabel ? options.dateLabel : 'Date' }}</mat-label>
-    <input matInput [matDatepicker]="picker" [formControlName]="tempDateCtrlName" [errorStateMatcher]="errorMatcher" (dateChange)="tempDateChange($event)" [required]="isDateTimeRequired" [dateInput]="tempDateCtrl" (onDirectiveValueChanged)="tempDateChangeFromDirective($event)">
+    <input matInput [matDatepicker]="picker" [formControlName]="tempDateCtrlName" [errorStateMatcher]="errorMatcher" (dateChange)="tempDateChangeFromBlur($event)" [required]="isDateTimeRequired" [dateInput]="tempDateCtrl" (onDirectiveValueChanged)="tempDateChangeFromDirective($event)">
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker></mat-datepicker>
     <mat-error>

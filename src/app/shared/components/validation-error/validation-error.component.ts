@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, ValidationErrors, FormGroup, AbstractControl } from '@angular/forms';
-import { getFormGroupName, getControlName, getIsCompositeControl } from '../../form-helpers/reactive-form-helper';
+import { getFormGroupName, getControlName, getChildCompositeControlDetail } from '../../form-helpers/reactive-form-helper';
 
 /**
  * At the time of writing for Angular 7 you can write up your validations any way you want so
