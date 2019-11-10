@@ -48,10 +48,12 @@ export class DateTimeFormControlComponent implements OnInit {
   constructor(private qcs: QuestionControlService) { }
 
   ngOnInit() {
+    // Create a dummy form control fopr our date.
     this.tempDateCtrlName = `tempDate${this.controlName}`;
     this.group.addControl(this.tempDateCtrlName, new FormControl(''));
     this.isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
 
+    // Check if date needs required validation.
     if (this.isDateTimeRequired) {
         this.tempDateCtrl.setValidators(Validators.required);
       }
@@ -91,7 +93,7 @@ export class DateTimeFormControlComponent implements OnInit {
         this.compositeControl.setValue(dateTime);
       });
     } else {
-      this.tempDateCtrl.valueChanges.pipe(debounceTime(500)).subscribe(s => {
+      this.tempDateCtrlValue$.subscribe(s => {
         this.isUpdateCompositeControl = true;
 
         if (!this.compositeControl.value && !s) { return; }
