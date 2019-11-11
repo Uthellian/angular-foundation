@@ -60,9 +60,10 @@ export class CompositeControlValidationErrorComponent implements OnInit {
    */
   get formGroupErrors() {
     const controlDetail = this.compositeControlDetail;
+    const controlName = this.controlName;
 
     // Sanity check
-		if (!this.group || (!controlDetail.controlName || !controlDetail.controlName.trim())) { return {}; }
+		if (!this.group || (!controlDetail.controlName || !controlDetail.controlName.trim()) || (!controlName || !controlName.trim())) { return {}; }
 
     // We'll start with looking for validation errors relevant to the specified form control.
     // Angular stores validation errors as an object with each property being a distinct 
@@ -76,7 +77,7 @@ export class CompositeControlValidationErrorComponent implements OnInit {
     // only contains errors relevant to the specified form control.
 		const errorList = groupErrorList.filter(f => f && f.value.associatedControl &&
 			(
-        (typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlDetail.controlName) ||
+        (typeof f.value.associatedControl === 'string' && (f.value.associatedControl === controlDetail.controlName || f.value.associatedControl === controlName)) ||
 			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlDetail.controlName))
       )
     );

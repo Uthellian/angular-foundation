@@ -10,7 +10,8 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
 
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
 		const controlDetails = getChildCompositeControlDetail(control);
-    
+    const actualControlName = getControlName(control);
+
     // Check if were validating against a composite control the name of the control should be prefixed a standard way
     let isChildOfComposite = controlDetails.isChildOfComposite;
 
@@ -24,16 +25,17 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
           : [];
     const idPropVal = control.parent.get('id') ? control.parent.get('id').value : null;
 
-    // Check if we have any cross field validation errors for a form group
+    
     const isFormArrayCrossValInError = formArrayErrors.some(f => f && f.value.associatedControl &&
 			((typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
 			(f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlName))));
 
+    // Check if we have any cross field validation errors for a form group
 		const formErrorsTemp = form.errors ?
       Object.keys(form.errors).map(key => ({ key, value: form.errors[key] })) : [];
 		const isCrossValInError = formErrorsTemp.some(f => f && f.value.associatedControl &&
 			(
-        (typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
+        (typeof f.value.associatedControl === 'string' && (f.value.associatedControl === controlName || f.value.associatedControl === actualControlName)) ||
 			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlName)))
         && (!f.value.invalidIds || f.value.invalidIds.some(s => s === idPropVal)
       )

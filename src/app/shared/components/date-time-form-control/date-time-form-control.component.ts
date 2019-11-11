@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDirective, Validators } from '@angular/forms';
+import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDirective, Validators, ValidatorFn } from '@angular/forms';
 import { CompositeControlErrorMatcher } from '../../form-helpers/composite-control-error-state-matcher';
 import { QuestionControlService } from '../../services/question-control.service';
 import { filter, tap, startWith, debounceTime } from 'rxjs/operators';
@@ -56,7 +56,11 @@ export class DateTimeFormControlComponent implements OnInit {
   /** Name of dummy time form control name. */
   tempTimeCtrlName: string;
 
+  /** Does the composite control have required validation */
   isDateTimeRequired: boolean = false;
+  
+  /** For date and time only if the user fills either one than both form controls needs required validation. */
+  isTempCtrlRequired: boolean = false;
 
   /** 
    * Behaviour subject to hold the value of the date control when the user blurs away from it. 
@@ -84,9 +88,11 @@ export class DateTimeFormControlComponent implements OnInit {
   constructor(private qcs: QuestionControlService) { }
 
   ngOnInit() {
+    this.group.setValidators([this.group.validator, this.dateTimeRequiredValidator]);
+
     // Create a dummy form control for our date.
     this.tempDateCtrlName = `tempDate${this.controlName}`;
-    this.group.addControl(this.tempDateCtrlName, new FormControl(''));
+    this.group.addControl(this.tempDateCtrlName, new FormControl('', [this.isDateValidWithMinimumAndMaximum(this.tempDateCtrlName)]));
 
     // Check if required validation is required by checking against the composite control
     this.isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
@@ -98,7 +104,7 @@ export class DateTimeFormControlComponent implements OnInit {
 
       // Check if required validation is required by checking against the composite control
       if (this.isDateTimeRequired) {
-        this.tempTimeCtrl.setValidators(Validators.required);
+        this.tempTimeCtrl.setValidators([Validators.required, this.invalidTimeValidator()]);
       }
     }
 
@@ -123,6 +129,10 @@ export class DateTimeFormControlComponent implements OnInit {
         this.tempTimeCtrl.valueChanges.pipe(startWith(''))
       ).pipe(debounceTime(500))
       .subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
+        
+        // We need required validation for our dummy controls if either one is filled in. 
+        this.isTempCtrlRequired = !!tempDateCtrlValue || !!tempTimeCtrlValue; 
+
         /** 
          * If the user has entered something in full we'll do nothing but
          * if they partially entered something like "1" we'll turn it into "01:00".
@@ -133,7 +143,9 @@ export class DateTimeFormControlComponent implements OnInit {
         }
 
         // Do nothing if both our dummy and composite control don't have any value.
-        if (!tempDateCtrlValue && !this.compositeControl.value) { return }
+        if (!tempDateCtrlValue && !this.compositeControl.value) { 
+          return; 
+        }
 
         this.isUpdateCompositeControl = true;
 
@@ -237,7 +249,7 @@ export class DateTimeFormControlComponent implements OnInit {
 		}
 
     const timeString = moment(timeValue, 'HH:mm').isValid() ? 
-        moment(timeValue, 'HH:mm').format('HH:mm').toString() : null;
+        moment(timeValue, 'HH:mm').format('HH:mm').toString() : timeValue;
     
     this.isUpdateDateFromDirective = false;
     return timeString;
@@ -272,5 +284,88 @@ export class DateTimeFormControlComponent implements OnInit {
     const tempDateValue = event;
     this.tempDateCtrlValue$.next(tempDateValue);
   }
+
+  /** Our date and time dummy controls will have required validation if either one is filled out. */
+  dateTimeRequiredValidator: ValidatorFn = (formGroup: FormGroup): ValidationErrors | null => {
+    // Our composite control has required validation so no need to proceed because our dummy controls will have it as well
+    if (this.isDateTimeRequired || !this.options.includeTime) { return null; }
+
+    const tempDateCtrl = formGroup.get(this.tempDateCtrlName);
+    const tempTimeCtrl = formGroup.get(this.tempTimeCtrlName);
+
+    if (!tempDateCtrl || !tempTimeCtrl) { return null; }
+
+    const tempDateCtrlValue = tempDateCtrl.value;
+    const tempTimeCtrlValue = tempTimeCtrl.value;
+
+    let invalidControl = "";
+
+    if (!!tempDateCtrlValue && !tempTimeCtrlValue) {
+      invalidControl = this.tempTimeCtrlName;
+    }
+
+    if (!tempDateCtrlValue && !!tempTimeCtrlValue) {
+      invalidControl = this.tempDateCtrlName;
+    }
+
+    return !invalidControl ? null :  { 'required': { associatedControl: invalidControl, message: 'This is required.' } }
+  };
+
+  /** Check if the entered time is valid 24 hour time. */
+  invalidTimeValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } => {
+      const value = control.value;
+
+      if (!value) { return null; }
+
+      const momentTime = moment(value, 'HH:mm');
+
+      return !momentTime.isValid() ? { 'invalidTime': { message: 'Time entered is invalid it must be HH:mm' } } : null;
+    }
+  }
+
+  /** Validation for the min and max date values in sql server */
+	isDateValidWithMinimumAndMaximum(dateControlName: string): ValidatorFn {
+		const validatorFunction = (control: FormControl) => {
+			const date = !control ? null : control.value;
+
+			// Sanity
+			if (!date) {
+				return null;
+			}
+
+			const sqlServerMinDate = moment('1753/01/01', 'YYYY/MM/DD').toDate();
+			const isDateAfterMinDate = moment(date).isSameOrAfter(moment(sqlServerMinDate));
+
+			// If date is before the min date
+			if (!isDateAfterMinDate) {
+				return {
+					dateBeforeSqlServerMinDate: {
+						associatedControl: dateControlName,
+						message: 'The entered date cannot be before 01/01/1753'
+					}
+				};
+			}
+
+			const sqlServerMaxDate = moment('9999/12/31', 'YYYY/MM/DD').toDate();
+			const isDateBeforeMaxDate = moment(date).isSameOrBefore(moment(sqlServerMaxDate));
+
+			// If date is after the max date
+			if (!isDateBeforeMaxDate) {
+
+				// Angular material datepicker usually prevents this from happening
+				return {
+					dateAfterSqlServerMaxDate: {
+						associatedControl: dateControlName,
+						message: 'The entered date cannot be after 31/12/9999'
+					}
+				};
+			}
+
+			return null;
+		};
+
+		return validatorFunction;
+	}
 
 }
