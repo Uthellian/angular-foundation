@@ -16,7 +16,7 @@ export interface IDateTimeOptions {
 export const childCompositeControlNames = ['tempDate', 'tempTime'];
 
 /** Hard coded whitelist of child contol names that ignore required validation from derived composite control. */
-export const ignoreRequiredChildControlNames = ['tempTime'];
+export const ignoreRequiredChildControlNames = ['tempDate', 'tempTime'];
 
 /** 
  * Does the form control have the specified validator by name. Please note
@@ -62,6 +62,10 @@ export function getChildCompositeControlDetail(control: AbstractControl): ICompo
       compositeControl,
       controlName
     }
+}
+
+export function getIsGroupContainChildComposite(group: FormGroup) {
+	return childCompositeControlNames.some(s1 => Object.keys(group.controls).some(s2 => s2.includes(s1)));
 }
 
 /**

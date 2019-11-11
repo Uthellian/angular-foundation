@@ -5,7 +5,7 @@ import { QuestionControlService } from '../../services/question-control.service'
 import { filter, tap, startWith, debounceTime } from 'rxjs/operators';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { combineLatest, BehaviorSubject } from 'rxjs';
-import { IDateTimeOptions, doesFormControlHaveValidator } from '../../form-helpers/reactive-form-helper';
+import { IDateTimeOptions, doesFormControlHaveValidator, getIsGroupContainChildComposite } from '../../form-helpers/reactive-form-helper';
 
 import {MAT_MOMENT_DATE_FORMATS, MomentDateAdapter} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
@@ -42,7 +42,11 @@ export class DateTimeFormControlComponent implements OnInit {
   @Input() group: FormGroup;
 
   /** Date / time component options */
-  @Input() options: IDateTimeOptions;
+  @Input() options: IDateTimeOptions = {
+    includeTime: false,
+    dateLabel: '',
+    timeLabel: ''
+  };
 
   /** Override angular validation. */
   errorMatcher = new CompositeControlErrorMatcher();
@@ -88,7 +92,15 @@ export class DateTimeFormControlComponent implements OnInit {
   constructor(private qcs: QuestionControlService) { }
 
   ngOnInit() {
-    this.group.setValidators([this.group.validator, this.dateTimeRequiredValidator]);
+    const isAlreadyContainValidations = getIsGroupContainChildComposite(this.group);
+
+		if (!isAlreadyContainValidations) {
+			const groupValidators = this.group.validator ? [this.group.validator, this.dateTimeRequiredValidator] : [this.dateTimeRequiredValidator];
+
+			this.group.setValidators(
+				groupValidators
+			);
+		}
 
     // Create a dummy form control for our date.
     this.tempDateCtrlName = `tempDate${this.controlName}`;
@@ -105,6 +117,8 @@ export class DateTimeFormControlComponent implements OnInit {
       // Check if required validation is required by checking against the composite control
       if (this.isDateTimeRequired) {
         this.tempTimeCtrl.setValidators([Validators.required, this.invalidTimeValidator()]);
+      } else {
+        this.tempTimeCtrl.setValidators([this.invalidTimeValidator()]);
       }
     }
 
@@ -142,18 +156,21 @@ export class DateTimeFormControlComponent implements OnInit {
           this.tempTimeCtrl.setValue(timeString, { emitEvent: false });
         }
 
-        // Do nothing if both our dummy and composite control don't have any value.
-        if (!tempDateCtrlValue && !this.compositeControl.value) { 
-          return; 
-        }
-
         this.isUpdateCompositeControl = true;
 
-        // Date takes precedence over time so if we don't have any than clear out the composite control.
-        if (!tempDateCtrlValue) {
-          this.compositeControl.setValue(null); 
+        // Do nothing if both our dummy and composite control don't have any value.
+        if (!tempDateCtrlValue || !tempTimeCtrlValue) {
+          if (this.compositeControl.value) {
+            this.compositeControl.setValue(null);
+          } 
           return; 
         }
+
+        // Date takes precedence over time so if we don't have any than clear out the composite control.
+        /*if (!tempDateCtrlValue) {
+          this.compositeControl.setValue(null); 
+          return; 
+        }*/
 
         const dateTime = this.getCombineDateTime(tempDateCtrlValue, tempTimeCtrlValue);
         
@@ -216,12 +233,13 @@ export class DateTimeFormControlComponent implements OnInit {
     /** Code to keep our dummy controls in sync with the composite control disable state. */
     this.compositeControl.statusChanges.subscribe(s => {
       const disabled = 'DISABLED';
-      const valid = 'VALID';
 
       if (s === disabled && !this.tempDateCtrl.disabled) {
         this.tempDateCtrl.disable({ emitEvent: false });
         this.tempTimeCtrl.disable({ emitEvent: false });
-      } else {
+      }
+      
+      if (s !== disabled && this.tempDateCtrl.disabled) {
         this.tempDateCtrl.enable({ emitEvent: false });
         this.tempTimeCtrl.enable({ emitEvent: false });
       }
@@ -258,7 +276,7 @@ export class DateTimeFormControlComponent implements OnInit {
   getCombineDateTime(dateValue: Date, timeValue: string) {
     const dateString = this.getDateString(dateValue);
     const timeString = this.getTimeString(timeValue);
-    const dateTime = moment(`${dateString} ${timeString}`, 'DD/MM/YYYY HH:mm');
+    const dateTime = moment(`${dateString} ${timeString}`, 'DD/MM/YYYY HH:mm').toDate();
 
     return dateTime;
   }
