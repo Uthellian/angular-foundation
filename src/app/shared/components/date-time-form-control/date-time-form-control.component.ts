@@ -162,7 +162,9 @@ export class DateTimeFormControlComponent implements OnInit {
         if (!tempDateCtrlValue || !tempTimeCtrlValue) {
           if (this.compositeControl.value) {
             this.compositeControl.setValue(null);
-          } 
+          } else {
+            this.isUpdateCompositeControl = false;
+          }
           return; 
         }
 

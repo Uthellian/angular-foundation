@@ -48,7 +48,13 @@ export class BasicFormComponent implements OnInit {
   }
 
   setDobCurrentDate() {
-    this.dob.setValue(new Date());
+    //this.dob.setValue(new Date());
+    this.basicForm.patchValue({
+      firstName: 'test',
+      surnameName: 'test',
+      dateOfBirth: new Date(),
+      titleId: 1
+    });
   }
 
   clearDob() {
@@ -64,7 +70,7 @@ export class BasicFormComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.basicForm.errors);
+    console.log(this.basicForm.get('dateOfBirth').value);
     this.qcs.isFormSubmitted$.next(true);
   }
 
