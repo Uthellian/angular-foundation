@@ -110,6 +110,21 @@ export class DateTimeFormControlComponent implements OnInit {
 
     this.errorMatcher = new CompositeControlErrorMatcher(this.controlName, this.group);
 
+    const compositeControlValue = this.compositeControl.value;
+
+		// Populate our dummy controls with the initial composite control value
+		if (compositeControlValue) {
+			const date = moment(this.getDateString(compositeControlValue), 'DD/MM/YYYY').toDate();
+
+			this.tempDateCtrl.setValue(date, { emitEvent: false });
+			this.tempDateCtrlValue$.next(date);
+
+			if (this.options.includeTime) {
+				const timeString = this.getTimeString(compositeControlValue);
+				this.tempTimeCtrl.setValue(timeString, { emitEvent: false });
+			}
+		}
+
     /** 
      * When the form is submitted display validations where applicable for 
      * any controls that havn't been touched.
