@@ -36,18 +36,21 @@ export class CompositeControlValidationErrorComponent implements OnInit {
     return this.group.get(this.controlName);
   }
 
-  get controlErrors() {
+  get compositeControlErrors() {
     const compositeControl = this.control;
-    const tempControl = this.tempControl;
-
+    
     // Recreate the composite control as is or with the required validation removed if applicable 
     const compositeControlErrorList = !compositeControl.errors ? [] : Object.keys(compositeControl.errors).map(key => ({ key, value: compositeControl.errors[key] }))
       .filter(f => f.key && f.key !== 'required');
     
     const compositeControlErrorObject = compositeControlErrorList && compositeControlErrorList.length > 0 ?
-			compositeControlErrorList.reduce((acc, cur) => ({ ...acc, [cur.key]: { ...cur.value } }), {}) : {};
+			compositeControlErrorList.reduce((acc, cur) => ({ ...acc, [cur.key]: { ...cur.value } }), {}) : {}; 
 
-    return { ...compositeControlErrorObject, ...tempControl.errors };
+      return { ...compositeControlErrorObject };
+  }
+
+  get controlErrors() {
+    return this.tempControl.errors;
   }
 
   /**

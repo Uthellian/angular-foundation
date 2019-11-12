@@ -97,36 +97,6 @@ export class DateTimeFormControlComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    /*const isAlreadyContainValidations = getIsGroupContainChildComposite(this.group);
-
-		if (!isAlreadyContainValidations) {
-			const groupValidators = this.group.validator ? [this.group.validator, this.dateTimeRequiredValidator] : [this.dateTimeRequiredValidator];
-
-			this.group.setValidators(
-				groupValidators
-			);
-		}*/
-
-    // Create a dummy form control for our date.
-    //this.tempDateCtrlName = `tempDate${this.controlName}`;
-    //this.group.addControl(this.tempDateCtrlName, new FormControl('', [this.isDateValidWithMinimumAndMaximum(this.tempDateCtrlName)]));
-
-    // Check if required validation is required by checking against the composite control
-    //this.isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
-
-    // Check if we need to create a dummy time form control
-    /*if (this.options.includeTime) {
-      this.tempTimeCtrlName = `tempTime${this.controlName}`;
-      this.group.addControl(this.tempTimeCtrlName, new FormControl('', { updateOn: 'blur' }));
-
-      // Check if required validation is required by checking against the composite control
-      if (this.isDateTimeRequired) {
-        this.tempTimeCtrl.setValidators([Validators.required, this.invalidTimeValidator()]);
-      } else {
-        this.tempTimeCtrl.setValidators([this.invalidTimeValidator()]);
-      }
-    }*/
-
     this.isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
 
     this.tempFormGroup = this.options.includeTime ? 
@@ -138,7 +108,7 @@ export class DateTimeFormControlComponent implements OnInit {
         date: this.isDateTimeRequired ? [null, [Validators.required]] : [null, []]
       });
 
-    this.errorMatcher = new CompositeControlErrorMatcher(this.tempDateCtrlName, this.tempFormGroup);
+    this.errorMatcher = new CompositeControlErrorMatcher(this.controlName, this.group);
 
     /** 
      * When the form is submitted display validations where applicable for 
@@ -185,12 +155,6 @@ export class DateTimeFormControlComponent implements OnInit {
           }
           return; 
         }
-
-        // Date takes precedence over time so if we don't have any than clear out the composite control.
-        /*if (!tempDateCtrlValue) {
-          this.compositeControl.setValue(null); 
-          return; 
-        }*/
 
         const dateTime = this.getCombineDateTime(tempDateCtrlValue, tempTimeCtrlValue);
         

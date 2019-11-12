@@ -26,7 +26,7 @@ export class BasicFormComponent implements OnInit {
     dateOfBirth: [null, []],
     titleId: [null, [Validators.required]]
   }, {
-    validator: [this.dobRequiredValidator]
+    //validator: [this.dobRequiredValidator]
   });
 
   titleRefData: TitleRefData[] = [
@@ -70,7 +70,7 @@ export class BasicFormComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.basicForm.get('dateOfBirth').value);
+    console.log(this.basicForm.invalid);
     this.qcs.isFormSubmitted$.next(true);
   }
 

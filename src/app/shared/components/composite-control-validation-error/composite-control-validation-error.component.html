@@ -20,8 +20,15 @@
     </li>
   </ng-container>
 
-  <!-- Validition errors for the specified form control. -->
+  <!-- Validition errors for the specified temp form control. -->
   <ng-container *ngFor="let errorKey of controlErrors | errorKey">
+    <li>
+      {{ errorKey | formErrorMessage: tempControl.getError(errorKey) }}
+    </li>
+  </ng-container>
+
+  <!-- Validition errors for the specified composite form control. -->
+  <ng-container *ngFor="let errorKey of compositeControlErrors | errorKey">
     <li>
       {{ errorKey | formErrorMessage: control.getError(errorKey) }}
     </li>

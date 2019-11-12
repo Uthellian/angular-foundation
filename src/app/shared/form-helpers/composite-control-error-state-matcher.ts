@@ -8,7 +8,10 @@ import { getFormGroupName, getControlName, getChildCompositeControlDetail, getIs
  */
 export class CompositeControlErrorMatcher implements ErrorStateMatcher {
 
+  /** Composite control name. */
   controlName: string;
+
+  /** Form group of composite control. */
   formGroup: any;
 
   constructor(controlName: string, formGroup: FormGroup) {
@@ -17,8 +20,8 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
   }
 
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-		//const controlName = getControlName(control);
-		const controlName = getControlName(control);
+		const compositeControl = this.formGroup.get(this.controlName);
+    const controlName = this.controlName;
 
     // Check if we have any cross field validation errors for a form array
     const isControlFromFormArray = !!control.parent.parent && control.parent.parent.controls instanceof Array;
@@ -34,7 +37,7 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
 
     // Check if we have any cross field validation errors for a form group
 		const formErrorsTemp = this.formGroup.errors ?
-      Object.keys(this.formGroup.errors).map(key => ({ key, value: form.errors[key] })) : [];
+      Object.keys(this.formGroup.errors).map(key => ({ key, value: this.formGroup.errors[key] })) : [];
 		const isCrossValInError = formErrorsTemp.some(f => f && f.value.associatedControl &&
 			(
         (typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
@@ -55,8 +58,7 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
       ) 
     );
 
-		/*return ((control.invalid || (this.formGroup.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || this.formGroup.submitted));*/
-    return true;
+		return (((control.invalid || compositeControl.invalid) || (this.formGroup.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
 	}
 
 }
