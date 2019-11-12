@@ -19,11 +19,11 @@ export class CrossFieldErrorMatcher implements ErrorStateMatcher {
           : [];
     const idPropVal = control.parent.get('id') ? control.parent.get('id').value : null;
 
-    // Check if we have any cross field validation errors for a form group
     const isFormArrayCrossValInError = formArrayErrors.some(f => f && f.value.associatedControl &&
 			((typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
 			(f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlName))));
 
+    // Check if we have any cross field validation errors for a form group
 		const formErrorsTemp = form.errors ?
       Object.keys(form.errors).map(key => ({ key, value: form.errors[key] })) : [];
 		const isCrossValInError = formErrorsTemp.some(f => f && f.value.associatedControl &&

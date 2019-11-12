@@ -26,7 +26,7 @@ export class BasicFormComponent implements OnInit {
     dateOfBirth: [null, []],
     titleId: [null, [Validators.required]]
   }, {
-    //validator: [this.dobRequiredValidator]
+    validator: [this.dobRequiredValidator]
   });
 
   titleRefData: TitleRefData[] = [

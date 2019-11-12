@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDirective, Validators, ValidatorFn } from '@angular/forms';
+import { FormControl, ValidationErrors, FormGroup, AbstractControl, FormGroupDirective, Validators, ValidatorFn, FormBuilder } from '@angular/forms';
 import { CompositeControlErrorMatcher } from '../../form-helpers/composite-control-error-state-matcher';
 import { QuestionControlService } from '../../services/question-control.service';
 import { filter, tap, startWith, debounceTime } from 'rxjs/operators';
@@ -49,16 +49,16 @@ export class DateTimeFormControlComponent implements OnInit {
   };
 
   /** Override angular validation. */
-  errorMatcher = new CompositeControlErrorMatcher();
+  errorMatcher;
 
   /** We need this to participate in angular validation when form is submitted. */
   @ViewChild('formRef', null) formRef: FormGroupDirective;
 
   /** Name of dummy date form control name. */
-  tempDateCtrlName: string;
+  tempDateCtrlName: string = 'date';
 
   /** Name of dummy time form control name. */
-  tempTimeCtrlName: string;
+  tempTimeCtrlName: string = 'time';
 
   /** Does the composite control have required validation */
   isDateTimeRequired: boolean = false;
@@ -85,14 +85,19 @@ export class DateTimeFormControlComponent implements OnInit {
    */
   isUpdateDateFromDirective: boolean = false;
 
-  get compositeControl() { return this.group.get(this.controlName); }
-  get tempDateCtrl() { return this.group.get(this.tempDateCtrlName); }
-  get tempTimeCtrl() { return this.group.get(this.tempTimeCtrlName); }
+  tempFormGroup: FormGroup;
 
-  constructor(private qcs: QuestionControlService) { }
+  get compositeControl() { return this.group.get(this.controlName); }
+  get tempDateCtrl() { return this.tempFormGroup.get(this.tempDateCtrlName); }
+  get tempTimeCtrl() { return this.tempFormGroup.get(this.tempTimeCtrlName); }
+
+  constructor(
+    private qcs: QuestionControlService,
+    private fb: FormBuilder
+  ) { }
 
   ngOnInit() {
-    const isAlreadyContainValidations = getIsGroupContainChildComposite(this.group);
+    /*const isAlreadyContainValidations = getIsGroupContainChildComposite(this.group);
 
 		if (!isAlreadyContainValidations) {
 			const groupValidators = this.group.validator ? [this.group.validator, this.dateTimeRequiredValidator] : [this.dateTimeRequiredValidator];
@@ -100,17 +105,17 @@ export class DateTimeFormControlComponent implements OnInit {
 			this.group.setValidators(
 				groupValidators
 			);
-		}
+		}*/
 
     // Create a dummy form control for our date.
-    this.tempDateCtrlName = `tempDate${this.controlName}`;
-    this.group.addControl(this.tempDateCtrlName, new FormControl('', [this.isDateValidWithMinimumAndMaximum(this.tempDateCtrlName)]));
+    //this.tempDateCtrlName = `tempDate${this.controlName}`;
+    //this.group.addControl(this.tempDateCtrlName, new FormControl('', [this.isDateValidWithMinimumAndMaximum(this.tempDateCtrlName)]));
 
     // Check if required validation is required by checking against the composite control
-    this.isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
+    //this.isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
 
     // Check if we need to create a dummy time form control
-    if (this.options.includeTime) {
+    /*if (this.options.includeTime) {
       this.tempTimeCtrlName = `tempTime${this.controlName}`;
       this.group.addControl(this.tempTimeCtrlName, new FormControl('', { updateOn: 'blur' }));
 
@@ -120,7 +125,20 @@ export class DateTimeFormControlComponent implements OnInit {
       } else {
         this.tempTimeCtrl.setValidators([this.invalidTimeValidator()]);
       }
-    }
+    }*/
+
+    this.isDateTimeRequired = doesFormControlHaveValidator(this.compositeControl, 'required');
+
+    this.tempFormGroup = this.options.includeTime ? 
+      this.fb.group({
+        date: this.isDateTimeRequired ? [null, [Validators.required]] : [null, []],
+        time: this.isDateTimeRequired ? [null, [Validators.required, this.invalidTimeValidator()]] : [null, [this.invalidTimeValidator()]]
+      }) : 
+      this.fb.group({
+        date: this.isDateTimeRequired ? [null, [Validators.required]] : [null, []]
+      });
+
+    this.errorMatcher = new CompositeControlErrorMatcher(this.tempDateCtrlName, this.tempFormGroup);
 
     /** 
      * When the form is submitted display validations where applicable for 
@@ -238,12 +256,18 @@ export class DateTimeFormControlComponent implements OnInit {
 
       if (s === disabled && !this.tempDateCtrl.disabled) {
         this.tempDateCtrl.disable({ emitEvent: false });
-        this.tempTimeCtrl.disable({ emitEvent: false });
+
+        if (this.options.includeTime) {
+          this.tempTimeCtrl.disable({ emitEvent: false });
+        }
       }
       
       if (s !== disabled && this.tempDateCtrl.disabled) {
         this.tempDateCtrl.enable({ emitEvent: false });
-        this.tempTimeCtrl.enable({ emitEvent: false });
+
+        if (this.options.includeTime) {
+          this.tempTimeCtrl.enable({ emitEvent: false });
+        }
       }
     });
   }

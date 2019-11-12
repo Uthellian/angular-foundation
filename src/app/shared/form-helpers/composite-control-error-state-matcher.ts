@@ -8,14 +8,17 @@ import { getFormGroupName, getControlName, getChildCompositeControlDetail, getIs
  */
 export class CompositeControlErrorMatcher implements ErrorStateMatcher {
 
+  controlName: string;
+  formGroup: any;
+
+  constructor(controlName: string, formGroup: FormGroup) {
+    this.controlName = controlName;
+    this.formGroup = formGroup;
+  }
+
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-		const controlDetails = getChildCompositeControlDetail(control);
-    const actualControlName = getControlName(control);
-
-    // Check if were validating against a composite control the name of the control should be prefixed a standard way
-    let isChildOfComposite = controlDetails.isChildOfComposite;
-
-    let controlName = controlDetails.controlName;
+		//const controlName = getControlName(control);
+		const controlName = getControlName(control);
 
     // Check if we have any cross field validation errors for a form array
     const isControlFromFormArray = !!control.parent.parent && control.parent.parent.controls instanceof Array;
@@ -25,17 +28,16 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
           : [];
     const idPropVal = control.parent.get('id') ? control.parent.get('id').value : null;
 
-    
     const isFormArrayCrossValInError = formArrayErrors.some(f => f && f.value.associatedControl &&
 			((typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
 			(f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlName))));
 
     // Check if we have any cross field validation errors for a form group
-		const formErrorsTemp = form.errors ?
-      Object.keys(form.errors).map(key => ({ key, value: form.errors[key] })) : [];
+		const formErrorsTemp = this.formGroup.errors ?
+      Object.keys(this.formGroup.errors).map(key => ({ key, value: form.errors[key] })) : [];
 		const isCrossValInError = formErrorsTemp.some(f => f && f.value.associatedControl &&
 			(
-        (typeof f.value.associatedControl === 'string' && (f.value.associatedControl === controlName || f.value.associatedControl === actualControlName)) ||
+        (typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
 			  (f.value.associatedControl.constructor === Array && f.value.associatedControl.find(ac => ac === controlName)))
         && (!f.value.invalidIds || f.value.invalidIds.some(s => s === idPropVal)
       )
@@ -53,14 +55,8 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
       ) 
     );
 
-    // Check if the composite control is in error
-    const isChildOfCompositeCtrlInError = isChildOfComposite && control.parent.get(controlName).invalid ? 
-      getIsIgnoreRequiredValidation(control) ?
-        Object.keys(controlDetails.compositeControl.errors).filter(f => f !== 'required').length >= 1 :
-        true
-      : false;
-
-		return (((control.invalid  || isChildOfCompositeCtrlInError) || (form.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
+		/*return ((control.invalid || (this.formGroup.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || this.formGroup.submitted));*/
+    return true;
 	}
 
 }

@@ -1,11 +1,11 @@
-<div [formGroup]="group" #formRef="ngForm">
+<div [formGroup]="tempFormGroup" #formRef="ngForm">
   <mat-form-field>
     <mat-label>{{ options.dateLabel ? options.dateLabel : 'Date' }}</mat-label>
     <input matInput [matDatepicker]="picker" [formControlName]="tempDateCtrlName" [errorStateMatcher]="errorMatcher" (dateChange)="tempDateChangeFromBlur($event)" [required]="isDateTimeRequired" [dateInput]="tempDateCtrl" (onDirectiveValueChanged)="tempDateChangeFromDirective($event)">
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker></mat-datepicker>
     <mat-error>
-      <app-composite-control-validation-error [group]="group" [controlName]="tempDateCtrlName"></app-composite-control-validation-error>
+      <app-composite-control-validation-error [group]="group" [controlName]="controlName" [tempGroup]="tempFormGroup" [tempControlName]="tempDateCtrlName"></app-composite-control-validation-error>
     </mat-error>
   </mat-form-field>
 
@@ -14,7 +14,7 @@
       <mat-label>{{ options.timeLabel ? options.timeLabel : 'Time' }}</mat-label>
       <input matInput [formControlName]="tempTimeCtrlName" [errorStateMatcher]="errorMatcher" [required]="isDateTimeRequired" [timeInput]="tempTimeCtrl" maxlength="5">
       <mat-error>
-        <app-composite-control-validation-error [group]="group" [controlName]="tempTimeCtrlName"></app-composite-control-validation-error>
+        <app-composite-control-validation-error [group]="group" [controlName]="controlName" [tempGroup]="tempFormGroup" [tempControlName]="tempTimeCtrlName"></app-composite-control-validation-error>
       </mat-error>
     </mat-form-field>
   </ng-container>
