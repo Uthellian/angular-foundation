@@ -58,7 +58,9 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
       ) 
     );
 
-		return (((control.invalid || compositeControl.invalid) || (this.formGroup.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
+    const isCompositeControlInvalid = !compositeControl.errors ? false : Object.keys(compositeControl.errors).map(key => ({ key, value: compositeControl.errors[key] })).filter(f => f.key && f.key !== 'required').length > 0;
+
+		return (((control.invalid || isCompositeControlInvalid) || (this.formGroup.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
 	}
 
 }
