@@ -164,7 +164,8 @@ export class DateTimeFormControlComponent implements OnInit {
         // Do nothing if both our dummy and composite control don't have any value.
         if (!tempDateCtrlValue || !tempTimeCtrlValue) {
           if (this.compositeControl.value) {
-            this.compositeControl.setValue(null);
+            //this.compositeControl.setValue(null);
+            this.setCompositeControlValue(null);
           } else {
             this.isUpdateCompositeControl = false;
           }
@@ -173,7 +174,8 @@ export class DateTimeFormControlComponent implements OnInit {
 
         const dateTime = this.getCombineDateTime(tempDateCtrlValue, tempTimeCtrlValue);
         
-        this.compositeControl.setValue(dateTime);
+        //this.compositeControl.setValue(dateTime);
+        this.setCompositeControlValue(dateTime);
       });
     } else {
 
@@ -185,12 +187,14 @@ export class DateTimeFormControlComponent implements OnInit {
 
         // Do nothing if both the dummy and composite date don't have any value
         if (!s) {
-          this.compositeControl.setValue(null); 
+          //this.compositeControl.setValue(null);
+          this.setCompositeControlValue(null); 
           return; 
         }
 
         const date = moment(this.getDateString(s), 'DD/MM/YYYY').toDate(); 
-        this.compositeControl.setValue(date);
+        //this.compositeControl.setValue(date);
+        this.setCompositeControlValue(date);
       });
     }
 
@@ -308,6 +312,30 @@ export class DateTimeFormControlComponent implements OnInit {
     const tempDateValue = event;
     this.tempDateCtrlValue$.next(tempDateValue);
   }
+
+  setCompositeControlValue(dateTime: Date) {
+		const compositeControlValue = this.compositeControl.value;
+		let compositeControlMoment = null;
+		let dateTimeValueMoment = null;
+
+		if (!dateTime && !compositeControlValue) { return; }
+		if ((!dateTime && compositeControlValue) || (dateTime && !compositeControlValue)) {
+			this.compositeControl.setValue(dateTime);
+			return;
+		}
+
+		if (!this.options.includeTime) {
+			compositeControlMoment = moment(this.getDateString(compositeControlValue), 'DD/MM/YYYY');
+			dateTimeValueMoment = moment(this.getDateString(dateTime), 'DD/MM/YYYY');
+		} else {
+			compositeControlMoment = moment(this.getDateString(compositeControlValue), 'DD/MM/YYYY HH:mm');
+			dateTimeValueMoment = moment(this.getDateString(dateTime), 'DD/MM/YYYY HH:mm');
+		}
+
+		if (!compositeControlMoment.isSame(dateTimeValueMoment)) {
+			this.compositeControl.setValue(dateTime);
+		}
+	}
 
   /** Our date and time dummy controls will have required validation if either one is filled out. */
   dateTimeRequiredValidator: ValidatorFn = (formGroup: FormGroup): ValidationErrors | null => {
