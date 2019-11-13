@@ -19,13 +19,15 @@ export class CompositeControlValidationErrorComponent implements OnInit {
   // The property name of the Angular form group we want to lookup validation errors
   @Input() controlName: string;
 
-  // The name of the form group that encompasses the individual form control that we care
-  // about. We need this for Angular cross field validation.
+  /* The name of the form group that encompasses the individual form control that we care
+     about. We need this for Angular cross field validation. */
   @Input() group: FormGroup;
 
-  // The name of the root form group that encompasses everything. This is useful if we want
-  // to validate form controls in form groups that are within form arrays and we want to use
-  // form controls outside the form array.
+  /**  
+   * The name of the root form group that encompasses everything. This is useful if we want
+   * to validate form controls in form groups that are within form arrays and we want to use
+   * form controls outside the form array. 
+   */
   @Input() rootGroup: FormGroup;
 
   @Input() tempControlName: string;
@@ -60,16 +62,18 @@ export class CompositeControlValidationErrorComponent implements OnInit {
     // Sanity check
 		if (!this.group || (!this.controlName || !this.controlName.trim())) { return {}; }
 
-    // We'll start with looking for validation errors relevant to the specified form control.
-    // Angular stores validation errors as an object with each property being a distinct 
-    // error. So we need to convert that object into a list to make it easier to work with.
-    // The array will look like something like this:
-    // [{ "nameOfValidationAsKey1": { associatedControl: ['nameOfControl1', 'nameOfControl2'], message: 'validationMessage1' } }, 
-    // { "nameOfValidationAsKey2": { associatedControl: 'nameOfControl2', message: 'validationMessage2' } }] 
+    /**  
+     * We'll start with looking for validation errors relevant to the specified form control.
+     * Angular stores validation errors as an object with each property being a distinct 
+     * error. So we need to convert that object into a list to make it easier to work with.
+     * The array will look like something like this:
+     * [{ "nameOfValidationAsKey1": { associatedControl: ['nameOfControl1', 'nameOfControl2'], message: 'validationMessage1' } }, 
+     * { "nameOfValidationAsKey2": { associatedControl: 'nameOfControl2', message: 'validationMessage2' } }]
+     */  
 		const groupErrorList = !this.group.errors ? [] : Object.keys(this.group.errors).map(key => ({ key, value: this.group.errors[key] }));
     
-    // Now that we have a extracted all the errors off the form group as a list we'll filter so that it
-    // only contains errors relevant to the specified form control.
+    /* Now that we have a extracted all the errors off the form group as a list we'll filter so that it
+     * only contains errors relevant to the specified form control. */
 		const errorList = groupErrorList.filter(f => f && f.value.associatedControl &&
 			(
         (typeof f.value.associatedControl === 'string' && f.value.associatedControl === this.controlName) ||
@@ -89,24 +93,24 @@ export class CompositeControlValidationErrorComponent implements OnInit {
    * which is contained within a form array.
    */
   get formArrayErrors() {
-    // Using the specified form control go up one level to the form group and look up the value of the form
-    // control with the following propert name "id"
+    /* Using the specified form control go up one level to the form group and look up the value of the form
+     * control with the following propert name "id" */
     const idPropVal = this.control.parent.get('id') ? this.control.parent.get('id').value : null;
     
     // Sanity check.
     if (!this.rootGroup || !idPropVal) { return {} }
 
-     // We'll start with looking for validation errors relevant to the specified form control.
-    // Angular stores validation errors as an object with each property being a distinct 
-    // error. So we need to convert that object into a list to make it easier to work with.
-    // The array will look like something like this:
-    // [{ "nameOfValidationAsKey1": { associatedControl: ['nameOfControl1', 'nameOfControl2'], invalidIds: [-1, -2], message: 'validationMessage1' } }, 
-    // { "nameOfValidationAsKey2": { associatedControl: 'nameOfControl2', invalidIds: [-2], message: 'validationMessage2' } }]
+    /* We'll start with looking for validation errors relevant to the specified form control.
+     * Angular stores validation errors as an object with each property being a distinct 
+     * error. So we need to convert that object into a list to make it easier to work with.
+     * The array will look like something like this:
+     * [{ "nameOfValidationAsKey1": { associatedControl: ['nameOfControl1', 'nameOfControl2'], invalidIds: [-1, -2], message: 'validationMessage1' } }, 
+     * { "nameOfValidationAsKey2": { associatedControl: 'nameOfControl2', invalidIds: [-2], message: 'validationMessage2' } }] */
     const groupErrorList = !this.rootGroup.errors ? [] : Object.keys(this.rootGroup.errors).map(key => ({ key, value: this.rootGroup.errors[key] }))
       .filter(f => f.value.invalidIds);
 
-    // Now that we have a extracted all the errors off the form group as a list we'll filter so that it
-    // only contains errors relevant to the specified form control.
+    /* Now that we have a extracted all the errors off the form group as a list we'll filter so that it
+     * only contains errors relevant to the specified form control. */
     const errorList = groupErrorList.filter(f => f && f.value.associatedControl &&
 			(
         (typeof f.value.associatedControl === 'string' && f.value.associatedControl === this.controlName) ||
@@ -133,17 +137,17 @@ export class CompositeControlValidationErrorComponent implements OnInit {
     // Sanity check.
     if (!this.rootGroup || !controlFormGroupName) { return {} }
 
-    // We'll start with looking for validation errors relevant to the specified form control.
-    // Angular stores validation errors as an object with each property being a distinct 
-    // error. So we need to convert that object into a list to make it easier to work with.
-    // The array will look like something like this:
-    // [{ "nameOfValidationAsKey1": { associatedControl: ['nameOfControl1', 'nameOfControl2'], formGroupName: 'addressDetailsGroup', message: 'validationMessage1' } }, 
-    // { "nameOfValidationAsKey2": { associatedControl: 'nameOfControl2', formGroupName: 'personDetailsGroup', message: 'validationMessage2' } }]
+    /* We'll start with looking for validation errors relevant to the specified form control.
+     * Angular stores validation errors as an object with each property being a distinct 
+     * error. So we need to convert that object into a list to make it easier to work with.
+     * The array will look like something like this:
+     * [{ "nameOfValidationAsKey1": { associatedControl: ['nameOfControl1', 'nameOfControl2'], formGroupName: 'addressDetailsGroup', message: 'validationMessage1' } }, 
+     * { "nameOfValidationAsKey2": { associatedControl: 'nameOfControl2', formGroupName: 'personDetailsGroup', message: 'validationMessage2' } }] */
     const groupErrorList = !this.rootGroup.errors ? [] : Object.keys(this.rootGroup.errors).map(key => ({ key, value: this.rootGroup.errors[key] }))
       .filter(f => f.value.formGroupName);
 
-    // Now that we have a extracted all the errors off the form group as a list we'll filter so that it
-    // only contains errors relevant to the specified form control.
+    /* Now that we have a extracted all the errors off the form group as a list we'll filter so that it
+     * only contains errors relevant to the specified form control. */
     const errorList = groupErrorList.filter(f => f && f.value.associatedControl &&
 			(
         (typeof f.value.associatedControl === 'string' && f.value.associatedControl === this.controlName) ||

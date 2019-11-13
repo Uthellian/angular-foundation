@@ -142,8 +142,8 @@ export class DateTimeFormControlComponent implements OnInit {
       
       // Keep composite control up to date based on date and time control.
       combineLatest(
-        this.tempDateCtrlValue$,
-        this.tempTimeCtrl.valueChanges.pipe(startWith(''))
+        [this.tempDateCtrlValue$,
+        this.tempTimeCtrl.valueChanges]
       ).pipe(debounceTime(500))
       .subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
         
@@ -222,6 +222,7 @@ export class DateTimeFormControlComponent implements OnInit {
         const date = moment(this.getDateString(s), 'DD/MM/YYYY').toDate();
         
         this.tempDateCtrl.setValue(date, { emitEvent: false });
+        this.tempDateCtrlValue$.next(date);
 
         if (this.options.includeTime) {
           const timeString = this.getTimeString(s);
@@ -253,7 +254,7 @@ export class DateTimeFormControlComponent implements OnInit {
 
   getDateString(dateValue: Date) {
     const dateString = moment(dateValue).isValid() ? 
-        moment(dateValue, 'DD/MM/YYYY').format('DD/MM/YYYY').toString() : '01/01/0001';
+        moment(dateValue, 'YYYY-MM-DD').format('DD/MM/YYYY').toString() : '01/01/0001';
     return dateString;
   }
 
