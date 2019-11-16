@@ -102,7 +102,7 @@ export class DateTimeFormControlComponent implements OnInit {
     this.tempFormGroup = this.options.includeTime ? 
       this.fb.group({
         date: this.isDateTimeRequired ? [null, [Validators.required]] : [null, []],
-        time: this.isDateTimeRequired ? [null, [Validators.required, this.invalidTimeValidator()]] : [null, [this.invalidTimeValidator()]]
+        time: this.isDateTimeRequired ? [null, { validators: [Validators.required, this.invalidTimeValidator()], updateOn: 'blur' }] : [null, { validators: [this.invalidTimeValidator()], updateOn: 'blur' }]
       }) : 
       this.fb.group({
         date: this.isDateTimeRequired ? [null, [Validators.required]] : [null, []]
@@ -145,8 +145,9 @@ export class DateTimeFormControlComponent implements OnInit {
         [this.tempDateCtrlValue$,
         this.tempTimeCtrl.valueChanges]
       ).pipe(debounceTime(500))
-      .subscribe(([tempDateCtrlValue, tempTimeCtrlValue]) => {
-        
+      .subscribe(([tempDateCtrlValue, ignoredTimeCtrlValue]) => {
+        const tempTimeCtrlValue = this.tempTimeCtrl.value;
+
         // We need required validation for our dummy controls if either one is filled in. 
         this.isTempCtrlRequired = !!tempDateCtrlValue || !!tempTimeCtrlValue; 
 
@@ -328,8 +329,8 @@ export class DateTimeFormControlComponent implements OnInit {
 			compositeControlMoment = moment(this.getDateString(compositeControlValue), 'DD/MM/YYYY');
 			dateTimeValueMoment = moment(this.getDateString(dateTime), 'DD/MM/YYYY');
 		} else {
-			compositeControlMoment = moment(this.getDateString(compositeControlValue), 'DD/MM/YYYY HH:mm');
-			dateTimeValueMoment = moment(this.getDateString(dateTime), 'DD/MM/YYYY HH:mm');
+			compositeControlMoment = moment(compositeControlValue, 'DD/MM/YYYY HH:mm');
+			dateTimeValueMoment = moment(dateTime, 'DD/MM/YYYY HH:mm');
 		}
 
 		if (!compositeControlMoment.isSame(dateTimeValueMoment)) {
