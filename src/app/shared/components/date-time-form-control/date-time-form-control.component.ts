@@ -137,7 +137,7 @@ export class DateTimeFormControlComponent implements OnInit {
         tap(() => {
           /** 
            * If we have a parent form reference we'll only programmatically trigger a form submit if the parent 
-           * has been as well
+           * has been as well.
            */ 
           if (!!this.parentFormRef && !this.parentFormRef.submitted) { return; }
           (this.formRef.submitted as any) = true;
