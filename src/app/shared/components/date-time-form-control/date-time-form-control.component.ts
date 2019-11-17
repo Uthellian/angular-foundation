@@ -227,7 +227,10 @@ export class DateTimeFormControlComponent implements OnInit {
            * for our dummy controls because we want to be in sync by removing all values as well as resetting
            * validations.
            */
-          if (this.compositeControl.pristine && !this.tempDateCtrl.pristine) {
+          const isTempDateUiInteracted = !this.tempDateCtrl.pristine || !this.tempDateCtrl.untouched;
+          const isTempTimeUiInteracted = !this.tempTimeCtrl.pristine || !this.tempTimeCtrl.untouched;
+
+          if (this.compositeControl.pristine && (isTempDateUiInteracted || isTempTimeUiInteracted)) {
             this.tempDateCtrl.reset(null, { emitEvent: false });
 
             if (this.options.includeTime) {
