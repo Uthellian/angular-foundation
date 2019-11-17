@@ -48,6 +48,8 @@ export class DateTimeFormControlComponent implements OnInit {
     timeLabel: ''
   };
 
+  @Input() parentFormRef: FormGroupDirective;
+
   /** Override angular validation. */
   errorMatcher;
 
@@ -129,13 +131,18 @@ export class DateTimeFormControlComponent implements OnInit {
      * When the form is submitted display validations where applicable for 
      * any controls that havn't been touched.
      */
-    /*this.qcs.isFormSubmitted$
+    this.qcs.isFormSubmitted$
       .pipe(
         filter(f => f),
         tap(() => {
+          /** 
+           * If we have a parent form reference we'll only programmatically trigger a form submit if the parent 
+           * has been as well
+           */ 
+          if (!!this.parentFormRef && !this.parentFormRef.submitted) { return; }
           (this.formRef.submitted as any) = true;
         })
-      ).subscribe();*/
+      ).subscribe();
 
     /** Code to keep our composite control value up to date based on our dummy controls. */
     if (this.options.includeTime) {

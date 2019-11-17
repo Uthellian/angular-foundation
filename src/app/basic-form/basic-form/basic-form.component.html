@@ -1,5 +1,5 @@
 <mat-card>
-  <form [formGroup]="basicForm" (ngSubmit)="onSubmit()" class="standard-form">
+  <form [formGroup]="basicForm" class="standard-form" #formRef="ngForm">
     <h2>Basic Form</h2>
 
     <mat-form-field>
@@ -16,7 +16,7 @@
       </mat-error>
     </mat-form-field>
     
-    <app-date-time-form-control [group]="basicForm" controlName="dateOfBirth" [options]="{ includeTime: true }"></app-date-time-form-control>
+    <app-date-time-form-control [parentFormRef]="formRef" [group]="basicForm" controlName="dateOfBirth" [options]="{ includeTime: true }"></app-date-time-form-control>
 
     <mat-form-field>
       <mat-select formControlName="titleId" name="title" placeholder="Title">
@@ -43,8 +43,8 @@
     <div>
       <button mat-raised-button color="warn" (click)="clearFormGroup()" type="button">Clear Form Group</button>
     </div>
-
-    <button type="submit" mat-raised-button color="primary" class="submit">Submit</button>
-    
   </form>
+  <div>
+    <button type="button" mat-raised-button color="primary" (click)="onSubmit()">Submit</button>
+  </div>
 </mat-card>

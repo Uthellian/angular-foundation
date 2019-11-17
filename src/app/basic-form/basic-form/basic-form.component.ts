@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors, FormGroupDirective, NgForm, FormArray } from '@angular/forms';
 import { QuestionControlService } from '../../shared/services/question-control.service';
 
@@ -13,6 +13,8 @@ export interface TitleRefData {
   styleUrls: ['./basic-form.component.css']
 })
 export class BasicFormComponent implements OnInit {
+
+  @ViewChild('formRef', null) formRef: FormGroupDirective;
 
   dobRequiredValidator: ValidatorFn = (formGroup: FormGroup): ValidationErrors | null => {
     const firstName = formGroup.get('firstName').value;
@@ -78,6 +80,7 @@ export class BasicFormComponent implements OnInit {
 
   onSubmit() {
     console.log(this.basicForm.invalid);
+    (this.formRef.submitted as any) = true;
     this.qcs.isFormSubmitted$.next(true);
   }
 
