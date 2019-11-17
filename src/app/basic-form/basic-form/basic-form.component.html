@@ -30,12 +30,21 @@
     </mat-form-field>
 
     <div>
+      <button mat-raised-button color="warn" (click)="clearFirstName()" type="button">Clear First Name</button>
+    </div>
+
+    <div>
       <button mat-raised-button color="basic" (click)="setDobCurrentDate()" type="button">Set Date Of Birth to current date and time</button>
       <button mat-raised-button color="warn" (click)="clearDob()" type="button">Clear Date Of Birth</button>
       <button mat-raised-button color="warn" (click)="disableDob()" type="button">Disable Date Of Birth</button>
-      <button mat-raised-button color="warn" (click)="undisableDob()" type="button">Undisable Date Of Birth</button>
+      <button mat-raised-button color="basic" (click)="undisableDob()" type="button">Undisable Date Of Birth</button>
     </div>
     
+    <div>
+      <button mat-raised-button color="warn" (click)="clearFormGroup()" type="button">Clear Form Group</button>
+    </div>
+
     <button type="submit" mat-raised-button color="primary" class="submit">Submit</button>
+    
   </form>
 </mat-card>

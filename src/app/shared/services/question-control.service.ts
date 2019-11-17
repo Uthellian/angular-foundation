@@ -9,6 +9,7 @@ import { QuestionTextbox } from '../base/question-textbox';
 export class QuestionControlService {
 
   isFormSubmitted$ = new BehaviorSubject<boolean>(false);
+  formsSubmitted$ = new BehaviorSubject<string[]>([]);
 
   formRootGroup = {
     personDetailsGroup: {

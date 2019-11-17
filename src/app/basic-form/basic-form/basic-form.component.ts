@@ -34,9 +34,8 @@ export class BasicFormComponent implements OnInit {
     { id: 2, name: 'Miss' }
   ]
 
-  get dob() {
-    return this.basicForm.get('dateOfBirth');
-  }
+  get firstName() { return this.basicForm.get('firstName'); }
+  get dob() { return this.basicForm.get('dateOfBirth'); }
 
   constructor(
     private fb: FormBuilder,
@@ -57,6 +56,10 @@ export class BasicFormComponent implements OnInit {
     });
   }
 
+  clearFirstName() {
+    this.firstName.reset();
+  }
+
   clearDob() {
     this.dob.reset();
   }
@@ -67,6 +70,10 @@ export class BasicFormComponent implements OnInit {
 
   undisableDob() {
     this.dob.enable();
+  }
+
+  clearFormGroup() {
+    this.basicForm.reset();
   }
 
   onSubmit() {

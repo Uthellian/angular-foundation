@@ -129,13 +129,13 @@ export class DateTimeFormControlComponent implements OnInit {
      * When the form is submitted display validations where applicable for 
      * any controls that havn't been touched.
      */
-    this.qcs.isFormSubmitted$
+    /*this.qcs.isFormSubmitted$
       .pipe(
         filter(f => f),
         tap(() => {
           (this.formRef.submitted as any) = true;
         })
-      ).subscribe();
+      ).subscribe();*/
 
     /** Code to keep our composite control value up to date based on our dummy controls. */
     if (this.options.includeTime) {
@@ -215,12 +215,27 @@ export class DateTimeFormControlComponent implements OnInit {
 
         // Clear out our dummy controls if it doesn't have any value.
         if (!s) {
+          /** 
+           * If the composite control or it's form group has been reset then we want to do the same 
+           * for our dummy controls because we want to be in sync by removing all values as well as resetting
+           * validations.
+           */
+          if (this.compositeControl.pristine && !this.tempDateCtrl.pristine) {
+            this.tempDateCtrl.reset(null, { emitEvent: false });
+
+            if (this.options.includeTime) {
+              this.tempTimeCtrl.reset(null, { emitEvent: false });
+            }
+
+            return;
+          }
+          
           this.tempDateCtrl.setValue(null, { emitEvent: false });
 
           if (this.options.includeTime) {
             this.tempTimeCtrl.setValue(null, { emitEvent: false });
           }
-          
+
           return;
         }
 
@@ -322,6 +337,12 @@ export class DateTimeFormControlComponent implements OnInit {
 		if (!dateTime && !compositeControlValue) { return; }
 		if ((!dateTime && compositeControlValue) || (dateTime && !compositeControlValue)) {
 			this.compositeControl.setValue(dateTime);
+
+      /**
+       * Our dummy control was updated through the UI so we need to programmatically do the same for
+       * our composite control.
+       */
+      this.compositeControl.markAsDirty();
 			return;
 		}
 
@@ -335,6 +356,12 @@ export class DateTimeFormControlComponent implements OnInit {
 
 		if (!compositeControlMoment.isSame(dateTimeValueMoment)) {
 			this.compositeControl.setValue(dateTime);
+
+      /**
+       * Our dummy control was updated through the UI so we need to programmatically do the same for
+       * our composite control.
+       */
+      this.compositeControl.markAsDirty();
 		}
 	}
 
