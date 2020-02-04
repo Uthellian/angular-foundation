@@ -24,12 +24,12 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
     const controlName = this.controlName;
 
     // Check if we have any cross field validation errors for a form array
-    const isControlFromFormArray = !!control.parent.parent && control.parent.parent.controls instanceof Array;
+    const isControlFromFormArray = !!compositeControl.parent.parent && compositeControl.parent.parent.controls instanceof Array;
     const formArrayErrors = isControlFromFormArray ? 
-      control.parent.errors ? 
-        Object.keys(control.parent.errors).map(key => ({ key, value: control.parent.errors[key] })) : []
+      compositeControl.parent.errors ? 
+        Object.keys(compositeControl.parent.errors).map(key => ({ key, value: compositeControl.parent.errors[key] })) : []
           : [];
-    const idPropVal = control.parent.get('id') ? control.parent.get('id').value : null;
+    const idPropVal = compositeControl.parent.get('id') ? compositeControl.parent.get('id').value : null;
 
     const isFormArrayCrossValInError = formArrayErrors.some(f => f && f.value.associatedControl &&
 			((typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
@@ -47,9 +47,9 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
     );
 
     // Check if we have any cross field validation errors for a form group within a root form group
-    const controlFormGroupName = getFormGroupName(control);
-    const rootErrorsTemp = control.root.errors ?
-      Object.keys(control.root.errors).map(key => ({ key, value: control.root.errors[key] })).filter(f => f.value.formGroupName) : [];
+    const controlFormGroupName = getFormGroupName(compositeControl);
+    const rootErrorsTemp = compositeControl.root.errors ?
+      Object.keys(compositeControl.root.errors).map(key => ({ key, value: compositeControl.root.errors[key] })).filter(f => f.value.formGroupName) : [];
     const isRootCrossValInError = rootErrorsTemp.some(f => f && f.value.associatedControl &&
 			(
         (typeof f.value.associatedControl === 'string' && f.value.associatedControl === controlName) ||
@@ -60,7 +60,7 @@ export class CompositeControlErrorMatcher implements ErrorStateMatcher {
 
     const isCompositeControlInvalid = !compositeControl.errors ? false : Object.keys(compositeControl.errors).map(key => ({ key, value: compositeControl.errors[key] })).filter(f => f.key && f.key !== 'required').length > 0;
 
-		return (((control.invalid || isCompositeControlInvalid) || (this.formGroup.invalid && isCrossValInError) || (control.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
+		return (((control.invalid || isCompositeControlInvalid) || (this.formGroup.invalid && isCrossValInError) || (compositeControl.root.invalid && isRootCrossValInError) || (isControlFromFormArray && isFormArrayCrossValInError)) && (control.touched || form.submitted));
 	}
 
 }
