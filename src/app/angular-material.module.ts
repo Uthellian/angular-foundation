@@ -1,5 +1,10 @@
-import { NgModule } from '@angular/core';
-import { MatInputModule, MatButtonModule, MatRadioModule, MatCardModule, MatSelectModule, MatDividerModule } from '@angular/material';
+import {NgModule} from '@angular/core';
+import {MatInputModule} from '@angular/material/input';
+import {MatButtonModule} from '@angular/material/button';
+import {MatRadioModule} from '@angular/material/radio';
+import {MatCardModule} from '@angular/material/card';
+import {MatSelectModule} from '@angular/material/select';
+import {MatDividerModule} from '@angular/material/divider';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatNativeDateModule, MatRippleModule} from '@angular/material/core';
 
